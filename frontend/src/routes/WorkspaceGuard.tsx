@@ -15,16 +15,21 @@ export default function WorkspaceGuard({
   } = useWorkspace();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div>
+        Loading Workspace...
+      </div>
+    );
   }
 
   if (!workspace) {
     return (
       <Navigate
         to="/create-workspace"
+        replace
       />
     );
   }
 
-  return children;
+  return <>{children}</>;
 }

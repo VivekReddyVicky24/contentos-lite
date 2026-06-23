@@ -48,21 +48,32 @@ export function WorkspaceProvider({
       return;
     }
 
-    const workspaces =
-      await getWorkspaces(user.id);
+    setLoading(true);
 
-    if (
-      workspaces &&
-      workspaces.length > 0
-    ) {
-      setWorkspace(workspaces[0]);
+    try {
+      const workspaces =
+        await getWorkspaces(user.id);
+
+      if (
+        workspaces &&
+        workspaces.length > 0
+      ) {
+        setWorkspace(workspaces[0]);
+      } else {
+        setWorkspace(null);
+      }
+    } catch (error) {
+      console.error(error);
+      setWorkspace(null);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
-    refreshWorkspace();
+    if (user) {
+      refreshWorkspace();
+    }
   }, [user]);
 
   return (

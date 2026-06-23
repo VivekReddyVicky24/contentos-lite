@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import LogoutButton from "@/components/LogoutButton";
 
 import {
@@ -35,6 +36,8 @@ export default function DashboardPage() {
           <h2>Documents</h2>
 
           <p>0</p>
+
+          <Link to="/documents">Documents</Link>
         </div>
 
         <div className="border rounded p-4">

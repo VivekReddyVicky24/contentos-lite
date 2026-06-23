@@ -8,6 +8,8 @@ import DashboardPage from "@/pages/DashboardPage";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import WorkspaceGuard from "@/routes/WorkspaceGuard";
 
+import DocumentsPage from "@/features/documents/pages/DocumentsPage";
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -28,6 +30,18 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/documents"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <DocumentsPage />
+              </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+      
       </Routes>
     </BrowserRouter>
   );
