@@ -34,3 +34,18 @@ export async function getWorkspaces(
 
   return data;
 }
+
+export async function getWorkspaceById(
+  workspaceId: string
+) {
+  const { data, error } =
+    await supabase
+      .from("workspaces")
+      .select("*")
+      .eq("id", workspaceId)
+      .single();
+
+  if (error) throw error;
+
+  return data;
+}
