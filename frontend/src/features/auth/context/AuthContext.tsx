@@ -5,18 +5,20 @@ import {
   useState,
 } from "react";
 
-import type { Session } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
 interface AuthContextType {
   session: Session | null;
   loading: boolean;
+  user: User | null;
 }
 
 const AuthContext =
   createContext<AuthContextType>({
     session: null,
     loading: true,
+    user: null,
   });
 
 export function AuthProvider({
@@ -54,6 +56,7 @@ export function AuthProvider({
       value={{
         session,
         loading,
+        user: session?.user ?? null,
       }}
     >
       {children}
