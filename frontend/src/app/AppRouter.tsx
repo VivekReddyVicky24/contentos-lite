@@ -2,9 +2,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
+import CreateWorkspacePage from "@/features/workspace/pages/CreateWorkspacePage";
 import DashboardPage from "@/pages/DashboardPage";
 
 import ProtectedRoute from "@/routes/ProtectedRoute";
+import WorkspaceGuard from "@/routes/WorkspaceGuard";
 
 export default function AppRouter() {
   return (
@@ -14,11 +16,15 @@ export default function AppRouter() {
 
         <Route path="/signup" element={<SignupPage />} />
 
+        <Route path="/create-workspace" element={<CreateWorkspacePage />} />
+
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <WorkspaceGuard>
+                <DashboardPage />
+              </WorkspaceGuard>
             </ProtectedRoute>
           }
         />

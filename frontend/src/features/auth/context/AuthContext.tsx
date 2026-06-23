@@ -5,20 +5,24 @@ import {
   useState,
 } from "react";
 
-import type { Session, User } from "@supabase/supabase-js";
+import type {
+  Session,
+  User,
+} from "@supabase/supabase-js";
+
 import { supabase } from "@/lib/supabase";
 
 interface AuthContextType {
   session: Session | null;
-  loading: boolean;
   user: User | null;
+  loading: boolean;
 }
 
 const AuthContext =
   createContext<AuthContextType>({
     session: null,
-    loading: true,
     user: null,
+    loading: true,
   });
 
 export function AuthProvider({
@@ -33,30 +37,36 @@ export function AuthProvider({
     useState(true);
 
   useEffect(() => {
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        setSession(data.session);
-        setLoading(false);
-      });
+    async function getInitialSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setSession(session);
+      setLoading(false);
+    }
+
+    getInitialSession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      (_, session) => {
+      (_event, session) => {
         setSession(session);
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         session,
-        loading,
         user: session?.user ?? null,
+        loading,
       }}
     >
       {children}
