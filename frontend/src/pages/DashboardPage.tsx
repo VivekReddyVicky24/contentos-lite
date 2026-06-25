@@ -44,6 +44,10 @@ export default function DashboardPage() {
           <h2>Content Generated</h2>
 
           <p>0</p>
+
+          <Link to="/brand-brain">
+            Brand Brain
+          </Link>
         </div>
       </div>
     </div>

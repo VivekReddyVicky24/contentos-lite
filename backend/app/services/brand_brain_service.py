@@ -6,6 +6,8 @@ from app.services.llm_service import (
     generate_grounded_response,
 )
 
+from app.core.supabase import supabase
+
 
 def ask_brand_brain(
     question: str,
@@ -34,14 +36,27 @@ def ask_brand_brain(
         context,
     )
 
+    if (
+        "I could not find"
+        in answer
+    ):
+        confidence = 0
+    elif len(chunks) >= 5:
+        confidence = 95
+    elif len(chunks) >= 3:
+        confidence = 80
+    else:
+        confidence = 60
+
+    unique_sources = list(
+        {
+            chunk["document_name"]
+            for chunk in chunks
+        }
+    )
+
     return {
         "answer": answer,
-        "sources": [
-            chunk["document_id"]
-            for chunk in chunks
-        ],
-        "confidence": min(
-            100,
-            len(chunks) * 20,
-        ),
+        "sources": unique_sources,
+        "confidence": confidence,
     }

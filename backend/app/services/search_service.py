@@ -24,4 +24,21 @@ def semantic_search(
         .execute()
     )
 
-    return result.data
+    chunks = result.data or []
+
+    for chunk in chunks:
+        document = (
+            supabase.table("documents")
+            .select("file_name")
+            .eq("id", chunk["document_id"])
+            .single()
+            .execute()
+        )
+
+        chunk["document_name"] = (
+            document.data["file_name"]
+            if document.data
+            else "Unknown Document"
+        )
+
+    return chunks

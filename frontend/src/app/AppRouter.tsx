@@ -4,6 +4,7 @@ import LoginPage from "@/features/auth/pages/LoginPage";
 import SignupPage from "@/features/auth/pages/SignupPage";
 import CreateWorkspacePage from "@/features/workspace/pages/CreateWorkspacePage";
 import DashboardPage from "@/pages/DashboardPage";
+import BrandBrainPage from "@/features/brand-brain/pages/BrandBrainPage";
 
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import WorkspaceGuard from "@/routes/WorkspaceGuard";
@@ -37,6 +38,17 @@ export default function AppRouter() {
             <ProtectedRoute>
               <WorkspaceGuard>
                 <DocumentsPage />
+              </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/brand-brain"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <BrandBrainPage />
               </WorkspaceGuard>
             </ProtectedRoute>
           }

@@ -12,6 +12,23 @@ import {
   getDocuments,
 } from "../services/documentService";
 
+function statusColor(
+  status: string,
+) {
+  switch (status) {
+    case "ready":
+      return "bg-green-500";
+    case "embedding":
+      return "bg-blue-500";
+    case "chunking":
+      return "bg-yellow-500";
+    case "extracting":
+      return "bg-orange-500";
+    default:
+      return "bg-red-500";
+  }
+}
+
 export default function DocumentsPage() {
   const { workspace } =
     useWorkspace();
@@ -100,19 +117,31 @@ export default function DocumentsPage() {
             key={doc.id}
             className="border rounded p-4"
           >
-            <h3>
-              {doc.file_name}
-            </h3>
-            <p>
-              {doc.file_type}
-            </p>
-            <p>
-              {(
-                doc.file_size /
-                1024
-              ).toFixed(2)}
-              KB
-            </p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3>
+                  {doc.file_name}
+                </h3>
+                <p>
+                  {doc.file_type}
+                </p>
+                <p>
+                  {(
+                    doc.file_size /
+                    1024
+                  ).toFixed(2)}
+                  KB
+                </p>
+              </div>
+
+              <span
+                className={`rounded-full px-3 py-1 text-xs text-white ${statusColor(
+                  doc.processing_status,
+                )}`}
+              >
+                {doc.processing_status}
+              </span>
+            </div>
           </div>
         ))}
       </div>

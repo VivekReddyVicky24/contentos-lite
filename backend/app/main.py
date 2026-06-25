@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.api.documents import router as document_router
 from app.api.pdf import router as pdf_router
@@ -20,6 +21,9 @@ from app.api.process_document import (
 from app.api.brand_brain import (
     router as brand_brain_router,
 )
+from app.api.brand_brain_stream import (
+    router as stream_router,
+)
 
 
 
@@ -27,6 +31,18 @@ from app.api.brand_brain import (
 app = FastAPI(
     title="ContentCrew API",
     version="1.0.0"
+)
+
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(
@@ -83,6 +99,11 @@ app.include_router(
     tags=["Brand Brain"],
 )
 
+app.include_router(
+    stream_router,
+    prefix="/brand-brain",
+    tags=["Brand Brain Streaming"],
+)
 
 @app.get("/")
 def root():
