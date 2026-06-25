@@ -8,6 +8,9 @@ from app.api.chunks import (
 from app.api.process import (
     router as process_router
 )
+from app.api.embeddings import (
+    router as embedding_router
+)
 
 app = FastAPI(
     title="ContentCrew API",
@@ -42,6 +45,12 @@ app.include_router(
     process_router,
     prefix="/process",
     tags=["Processing"]
+)
+
+app.include_router(
+    embedding_router,
+    prefix="/embeddings",
+    tags=["Embeddings"]
 )
 
 @app.get("/")
