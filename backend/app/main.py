@@ -14,6 +14,11 @@ from app.api.embeddings import (
 from app.api.search import (
     router as search_router
 )
+from app.api.process_document import (
+    router as process_document_router
+)
+
+
 
 
 app = FastAPI(
@@ -61,6 +66,12 @@ app.include_router(
     search_router,
     prefix="/search",
     tags=["Search"]
+)
+
+app.include_router(
+    process_document_router,
+    prefix="/process-document",
+    tags=["Document Processing"]
 )
 
 @app.get("/")
