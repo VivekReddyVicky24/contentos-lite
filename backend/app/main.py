@@ -5,6 +5,9 @@ from app.api.pdf import router as pdf_router
 from app.api.chunks import (
     router as chunk_router
 )
+from app.api.process import (
+    router as process_router
+)
 
 app = FastAPI(
     title="ContentCrew API",
@@ -33,6 +36,12 @@ app.include_router(
     chunk_router,
     prefix="/chunks",
     tags=["Chunks"]
+)
+
+app.include_router(
+    process_router,
+    prefix="/process",
+    tags=["Processing"]
 )
 
 @app.get("/")
