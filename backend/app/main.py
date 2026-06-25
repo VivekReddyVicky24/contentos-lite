@@ -24,6 +24,9 @@ from app.api.brand_brain import (
 from app.api.brand_brain_stream import (
     router as stream_router,
 )
+from app.api.agents import (
+    router as agent_router,
+)
 
 
 
@@ -103,6 +106,12 @@ app.include_router(
     stream_router,
     prefix="/brand-brain",
     tags=["Brand Brain Streaming"],
+)
+
+app.include_router(
+    agent_router,
+    prefix="/agents",
+    tags=["Agents"],
 )
 
 @app.get("/")
