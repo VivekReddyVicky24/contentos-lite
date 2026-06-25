@@ -7,3 +7,5 @@ class ContentState(
     topic: str
 
     research: str
+
+    plan: dict
