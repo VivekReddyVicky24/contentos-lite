@@ -11,6 +11,10 @@ from app.api.process import (
 from app.api.embeddings import (
     router as embedding_router
 )
+from app.api.search import (
+    router as search_router
+)
+
 
 app = FastAPI(
     title="ContentCrew API",
@@ -51,6 +55,12 @@ app.include_router(
     embedding_router,
     prefix="/embeddings",
     tags=["Embeddings"]
+)
+
+app.include_router(
+    search_router,
+    prefix="/search",
+    tags=["Search"]
 )
 
 @app.get("/")
