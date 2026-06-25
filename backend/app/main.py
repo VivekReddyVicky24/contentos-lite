@@ -17,6 +17,9 @@ from app.api.search import (
 from app.api.process_document import (
     router as process_document_router
 )
+from app.api.brand_brain import (
+    router as brand_brain_router,
+)
 
 
 
@@ -73,6 +76,13 @@ app.include_router(
     prefix="/process-document",
     tags=["Document Processing"]
 )
+
+app.include_router(
+    brand_brain_router,
+    prefix="/brand-brain",
+    tags=["Brand Brain"],
+)
+
 
 @app.get("/")
 def root():
