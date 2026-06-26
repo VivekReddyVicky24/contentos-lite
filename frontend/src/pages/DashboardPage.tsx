@@ -48,6 +48,10 @@ export default function DashboardPage() {
           <Link to="/brand-brain">
             Brand Brain
           </Link>
+          <p>0</p>
+          <Link to="/content-studio">
+  Content Studio
+</Link>
         </div>
       </div>
     </div>

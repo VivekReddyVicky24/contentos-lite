@@ -10,6 +10,7 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 import WorkspaceGuard from "@/routes/WorkspaceGuard";
 
 import DocumentsPage from "@/features/documents/pages/DocumentsPage";
+import ContentStudioPage from "@/features/content-studio/pages/ContentStudioPage";
 
 export default function AppRouter() {
   return (
@@ -53,7 +54,18 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-      
+
+        <Route
+          path="/content-studio"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <ContentStudioPage />
+              </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
