@@ -14,7 +14,7 @@ load_dotenv()
 
 
 llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-2.0-flash-lite",
     google_api_key=os.getenv(
         "GEMINI_API_KEY"
     ),
@@ -33,5 +33,11 @@ def research_node(
     )
 
     return {
-        "research": response.content
-    }
+    "research": response.content,
+
+    "current_agent":
+        "research",
+
+    "execution_log":
+        ["research: completed"],
+}

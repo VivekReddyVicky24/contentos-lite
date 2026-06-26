@@ -7,8 +7,8 @@ from langchain_google_genai import (
     ChatGoogleGenerativeAI,
 )
 
-from app.agents.prompts.planner_prompt import (
-    PLANNER_PROMPT,
+from app.agents.prompts.seo_prompt import (
+    SEO_PROMPT,
 )
 
 load_dotenv()
@@ -22,10 +22,15 @@ llm = ChatGoogleGenerativeAI(
 )
 
 
-def planner_node(state):
+def seo_node(state):
 
-    prompt = PLANNER_PROMPT.format(
-        research=state["research"]
+    prompt = SEO_PROMPT.format(
+        topic=state["topic"],
+        research=state["research"],
+        plan=json.dumps(
+            state["plan"],
+            indent=2,
+        ),
     )
 
     response = llm.invoke(prompt)
@@ -39,37 +44,37 @@ def planner_node(state):
             .strip()
         )
 
-        plan = json.loads(cleaned)
+        seo = json.loads(cleaned)
 
     except Exception as e:
 
-        print("PLANNER ERROR:", e)
-        print("RAW RESPONSE:")
+        print("SEO ERROR:", e)
+
         print(response.content)
 
-        plan = {
-            "target_audience": [],
-            "content_angles": [],
-            "blog_titles": [],
-            "content_goal":
-                "Could not generate plan",
+        seo = {
+            "primary_keyword": "",
+            "secondary_keywords": [],
+            "search_intent": "",
+            "meta_title": "",
+            "meta_description": "",
+            "internal_link_ideas": [],
         }
-    
     logs = state.get(
         "execution_log",
         []
     )
 
     logs.append(
-        "planner: completed"
-    )
-    
+        "seo: completed"
+    )    
+
     return {
-    "plan": plan,
+    "seo": seo,
 
     "current_agent":
-        "planner",
+        "seo",
 
     "execution_log":
         logs,
-}
+    }

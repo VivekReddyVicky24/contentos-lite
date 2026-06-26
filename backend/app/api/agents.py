@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi import HTTPException
 
 from pydantic import BaseModel
 
@@ -15,14 +16,29 @@ class AgentRequest(
     topic: str
 
 
-@router.post("/research")
-async def research(
-    request: AgentRequest,
-):
-    result = graph.invoke(
-        {
-            "topic": request.topic,
-        }
-    )
 
-    return result
+
+
+@router.post("/research")
+async def research(request: AgentRequest):
+
+    try:
+
+        result = graph.invoke(
+            {
+                "topic": request.topic,
+            }
+        )
+
+        return result
+
+    except HTTPException:
+
+        raise
+
+    except Exception as e:
+
+        raise HTTPException(
+            status_code=429,
+            detail=str(e),
+        )
