@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from app.db.supabase import supabase
-
+from app.services.evaluation_service import (
+    get_workspace_evaluations,
+)
 
 router = APIRouter(
     prefix="/evaluations",
@@ -16,19 +17,6 @@ async def get_evaluations(
     workspace_id: str,
 ):
 
-    response = (
-        supabase
-        .table("evaluations")
-        .select("*")
-        .eq(
-            "workspace_id",
-            workspace_id,
-        )
-        .order(
-            "created_at",
-            desc=True,
-        )
-        .execute()
+    return get_workspace_evaluations(
+        workspace_id
     )
-
-    return response.data

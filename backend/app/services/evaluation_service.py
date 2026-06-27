@@ -28,3 +28,25 @@ def save_evaluation(
         )
         .execute()
     )
+
+
+def get_workspace_evaluations(
+    workspace_id: str,
+):
+
+    response = (
+        supabase
+        .table("evaluations")
+        .select("*")
+        .eq(
+            "workspace_id",
+            workspace_id,
+        )
+        .order(
+            "created_at",
+            desc=True,
+        )
+        .execute()
+    )
+
+    return response.data

@@ -15,6 +15,8 @@ import ContentStudioPage from "@/features/content-studio/pages/ContentStudioPage
 
 import BrandSetupPage from "@/features/brand/pages/BrandSetupPage";
 
+import EvaluationDashboard from "@/features/evaluation/pages/EvaluationDashboard";
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -87,6 +89,17 @@ export default function AppRouter() {
               {/* <WorkspaceGuard> */}
                 <BrandSetupPage />
               {/* </WorkspaceGuard> */}
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/evaluations"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <EvaluationDashboard />
+              </WorkspaceGuard>
             </ProtectedRoute>
           }
         />
