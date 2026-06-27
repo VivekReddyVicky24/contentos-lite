@@ -30,7 +30,9 @@ from app.api.agents import (
 from app.api.brand import (
     router as brand_router,
 )
-
+from app.api.evaluation import (
+    router as evaluation_router,
+)
 
 
 
@@ -119,6 +121,10 @@ app.include_router(
 
 app.include_router(
     brand_router
+)
+
+app.include_router(
+    evaluation_router
 )
 
 

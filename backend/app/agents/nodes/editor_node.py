@@ -7,24 +7,23 @@ from langchain_google_genai import (
     ChatGoogleGenerativeAI,
 )
 
-from app.agents.prompts.editor_prompt import (
-    EDITOR_PROMPT,
-)
-
 from app.agents.prompts.brand_context import (
     build_brand_context,
 )
-
-from app.guardrails.output_validator import (
-    validate_output,
+from app.agents.prompts.editor_prompt import (
+    EDITOR_PROMPT,
 )
-
 from app.evaluation.evaluator import (
     evaluate_content,
 )
+from app.guardrails.output_validator import (
+    validate_output,
+)
+from app.services.evaluation_service import (
+    save_evaluation,
+)
 
 load_dotenv()
-
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-lite",
@@ -79,7 +78,7 @@ def editor_node(state):
             "conclusion": "",
             "call_to_action": "",
             "editor_notes": [
-                "Editing failed"
+                "Editing failed",
             ],
         }
 
@@ -92,8 +91,6 @@ def editor_node(state):
         "editor: completed"
     )
 
-    output_text = str(edited)
-
     workspace_id = (
         state.get(
             "brand_profile",
@@ -102,6 +99,8 @@ def editor_node(state):
             "workspace_id"
         )
     )
+
+    output_text = str(edited)
 
     valid, error = validate_output(
         output_text,
@@ -116,6 +115,7 @@ def editor_node(state):
 
         return {
             "edited_draft": {},
+            "evaluation": {},
             "failed": True,
             "error_message": error,
             "current_agent": "editor",
@@ -135,29 +135,22 @@ def editor_node(state):
         ),
     )
 
+    if workspace_id:
+
+        save_evaluation(
+            workspace_id,
+            evaluation,
+        )
+
     logs.append(
         "evaluation completed"
     )
 
     return {
         "edited_draft": edited,
-
-        "evaluation":
-            evaluation,
-
+        "evaluation": evaluation,
         "failed": False,
-
         "error_message": "",
-
-        "current_agent":
-            "editor",
-
-        "execution_log":
-            logs,
+        "current_agent": "editor",
+        "execution_log": logs,
     }
-# TODO:
-# Add brand voice constraints
-# Add groundedness checks
-# Add hallucination detection
-# Add readability scoring
-# Add citation preservation
