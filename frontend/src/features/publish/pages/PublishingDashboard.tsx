@@ -7,8 +7,11 @@ import {
   useWorkspace,
 } from "@/features/workspace/context/WorkspaceContext";
 
+import PublishForm from "../components/PublishForm";
+
 import {
   getPublications,
+  publishContent,
 } from "../services/publishService";
 
 import type {
@@ -28,30 +31,71 @@ export default function PublishingDashboard() {
   ] = useState<Publication[]>([]);
 
 
-  useEffect(() => {
+  async function refresh() {
 
     if (!workspace) {
       return;
     }
 
-    getPublications(
-      workspace.id,
-    ).then(
-      setPublications,
-    );
+    const data =
+      await getPublications(
+        workspace.id,
+      );
+
+    setPublications(data);
+  }
+
+
+  useEffect(() => {
+
+    void refresh();
 
   }, [workspace]);
 
 
+  async function handlePublish(
+    platform: string,
+    title: string,
+    content: string,
+  ) {
+
+    if (!workspace) {
+      return;
+    }
+
+    await publishContent({
+      workspace_id:
+        workspace.id,
+
+      platform:
+        platform as
+          | "medium"
+          | "wordpress"
+          | "ghost",
+
+      title,
+      content,
+    });
+
+    await refresh();
+  }
+
+
   return (
 
-    <div className="mx-auto max-w-6xl p-8">
+    <div className="mx-auto max-w-7xl p-8">
 
       <h1 className="mb-8 text-4xl font-bold">
-        Publishing History
+        Publishing Center
       </h1>
 
-      <div className="space-y-4">
+      <PublishForm
+        onPublish={
+          handlePublish
+        }
+      />
+
+      <div className="mt-8 space-y-4">
 
         {publications.map(
           (publication) => (

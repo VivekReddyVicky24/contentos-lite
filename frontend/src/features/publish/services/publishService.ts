@@ -20,3 +20,21 @@ export async function getPublications(
 
   return response.data;
 }
+
+import type {
+  PublishRequest,
+} from "../types/publish";
+
+
+export async function publishContent(
+  data: PublishRequest,
+) {
+
+  const response =
+    await axios.post(
+      `${API_URL}/publish`,
+      data,
+    );
+
+  return response.data;
+}
