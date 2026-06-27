@@ -15,6 +15,10 @@ from app.agents.prompts.brand_context import (
     build_brand_context,
 )
 
+from app.guardrails.output_validator import (
+    validate_output,
+)
+
 load_dotenv()
 
 
@@ -84,8 +88,34 @@ def editor_node(state):
         "editor: completed"
     )
 
+    output_text = str(edited)
+
+    valid, error = validate_output(
+        output_text
+    )
+
+    if not valid:
+
+        logs.append(
+            f"editor validation failed: {error}"
+        )
+
+        return {
+            "edited_draft": {},
+            "failed": True,
+            "error_message": error,
+            "current_agent": "editor",
+            "execution_log": logs,
+        }
+
+    logs.append(
+        "editor validation passed"
+    )
+
     return {
         "edited_draft": edited,
+        "failed": False,
+        "error_message": "",
         "current_agent": "editor",
         "execution_log": logs,
     }
