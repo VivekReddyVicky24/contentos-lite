@@ -16,16 +16,26 @@ import ContentStudioPage from "@/features/content-studio/pages/ContentStudioPage
 import BrandSetupPage from "@/features/brand/pages/BrandSetupPage";
 
 import EvaluationDashboard from "@/features/evaluation/pages/EvaluationDashboard";
+import PublishingDashboard from "@/features/publish/pages/PublishingDashboard";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
 
-        <Route path="/signup" element={<SignupPage />} />
+        <Route
+          path="/signup"
+          element={<SignupPage />}
+        />
 
-        <Route path="/create-workspace" element={<CreateWorkspacePage />} />
+        <Route
+          path="/create-workspace"
+          element={<CreateWorkspacePage />}
+        />
 
         <Route
           path="/"
@@ -87,7 +97,7 @@ export default function AppRouter() {
           element={
             <ProtectedRoute>
               {/* <WorkspaceGuard> */}
-                <BrandSetupPage />
+              <BrandSetupPage />
               {/* </WorkspaceGuard> */}
             </ProtectedRoute>
           }
@@ -104,6 +114,14 @@ export default function AppRouter() {
           }
         />
 
+        <Route
+          path="/publishing"
+          element={
+            <ProtectedRoute>
+              <PublishingDashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
