@@ -29,6 +29,8 @@ class ContentState(TypedDict):
 
     execution_log: list[str]
 
+    evaluation: dict
+
     failed: bool
 
     error_message: str

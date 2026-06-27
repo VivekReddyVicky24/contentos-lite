@@ -19,6 +19,10 @@ from app.guardrails.output_validator import (
     validate_output,
 )
 
+from app.evaluation.evaluator import (
+    evaluate_content,
+)
+
 load_dotenv()
 
 
@@ -122,15 +126,35 @@ def editor_node(state):
         "editor validation passed"
     )
 
+    evaluation = evaluate_content(
+        edited,
+        state["research"],
+        state.get(
+            "brand_profile",
+            {},
+        ),
+    )
+
+    logs.append(
+        "evaluation completed"
+    )
+
     return {
         "edited_draft": edited,
+
+        "evaluation":
+            evaluation,
+
         "failed": False,
+
         "error_message": "",
-        "current_agent": "editor",
-        "execution_log": logs,
+
+        "current_agent":
+            "editor",
+
+        "execution_log":
+            logs,
     }
-
-
 # TODO:
 # Add brand voice constraints
 # Add groundedness checks
