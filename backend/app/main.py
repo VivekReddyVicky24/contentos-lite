@@ -33,6 +33,9 @@ from app.api.brand import (
 from app.api.evaluation import (
     router as evaluation_router,
 )
+from app.api.publish import (
+    router as publish_router,
+)
 
 
 
@@ -127,6 +130,9 @@ app.include_router(
     evaluation_router
 )
 
+app.include_router(
+    publish_router
+)
 
 @app.get("/")
 def root():
