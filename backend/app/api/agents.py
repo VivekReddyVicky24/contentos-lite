@@ -32,7 +32,8 @@ async def research(
     try:
 
         validate_input(
-            request.topic
+            request.topic,
+            request.workspace_id,
         )
 
         brand_profile = (

@@ -90,8 +90,18 @@ def editor_node(state):
 
     output_text = str(edited)
 
+    workspace_id = (
+        state.get(
+            "brand_profile",
+            {},
+        ).get(
+            "workspace_id"
+        )
+    )
+
     valid, error = validate_output(
-        output_text
+        output_text,
+        workspace_id,
     )
 
     if not valid:
