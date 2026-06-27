@@ -18,6 +18,8 @@ import BrandSetupPage from "@/features/brand/pages/BrandSetupPage";
 import EvaluationDashboard from "@/features/evaluation/pages/EvaluationDashboard";
 import PublishingDashboard from "@/features/publish/pages/PublishingDashboard";
 
+import AnalyticsDashboard from "@/features/analytics/pages/AnalyticsDashboard";
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -119,6 +121,17 @@ export default function AppRouter() {
           element={
             <ProtectedRoute>
               <PublishingDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute>
+              {/* <WorkspaceGuard> */}
+                <AnalyticsDashboard />
+              {/* </WorkspaceGuard> */}
             </ProtectedRoute>
           }
         />
