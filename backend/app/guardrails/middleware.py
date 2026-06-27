@@ -12,8 +12,14 @@ from app.guardrails.prompt_injection import (
 from app.guardrails.toxicity import (
     is_toxic,
 )
+from app.guardrails.content_size import (
+    validate_content_size,
+)
 from app.services.guardrail_service import (
     log_guardrail_violation,
+)
+from app.guardrails.rate_limit import (
+    check_rate_limit,
 )
 
 
@@ -21,6 +27,40 @@ def validate_input(
     text: str,
     workspace_id: str | None = None,
 ):
+
+    if workspace_id:
+
+        allowed = check_rate_limit(
+            workspace_id
+        )
+
+        if not allowed:
+
+            log_guardrail_violation(
+                workspace_id,
+                "rate_limit",
+                text,
+            )
+
+            raise HTTPException(
+                status_code=429,
+                detail="Rate limit exceeded.",
+            )
+
+    if not validate_content_size(
+        text
+    ):
+
+        log_guardrail_violation(
+            workspace_id,
+            "content_too_large",
+            text,
+        )
+
+        raise HTTPException(
+            status_code=400,
+            detail="Input exceeds 5000 characters.",
+        )
 
     if detect_prompt_injection(text):
 
