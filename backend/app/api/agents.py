@@ -11,6 +11,10 @@ from app.services.brand_service import (
     get_brand_profile_for_agent,
 )
 
+from app.guardrails.middleware import (
+    validate_input,
+)
+
 router = APIRouter()
 
 
@@ -26,6 +30,10 @@ async def research(
     request: ResearchRequest,
 ):
     try:
+
+        validate_input(
+            request.topic
+        )
 
         brand_profile = (
             get_brand_profile_for_agent(
