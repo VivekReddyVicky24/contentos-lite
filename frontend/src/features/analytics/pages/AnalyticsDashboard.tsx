@@ -3,12 +3,20 @@ import {
   useState,
 } from "react";
 
-import {
-  useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+import { useWorkspace }
+from "@/features/workspace/context/WorkspaceContext";
 
 import AnalyticsCard
 from "../components/AnalyticsCard";
+
+import ContentMetricsChart
+from "../components/ContentMetricsChart";
+
+import InsightsCard
+from "../components/InsightsCard";
+
+import QualityMetricsChart
+from "../components/QualityMetricsChart";
 
 import {
   getAnalytics,
@@ -31,7 +39,6 @@ export default function AnalyticsDashboard() {
   ] = useState<Analytics | null>(
     null,
   );
-
 
   useEffect(() => {
 
@@ -57,7 +64,6 @@ export default function AnalyticsDashboard() {
     );
   }
 
-
   return (
 
     <div className="mx-auto max-w-7xl p-8">
@@ -69,28 +75,48 @@ export default function AnalyticsDashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
 
         <AnalyticsCard
-          title="Content Generated"
+          title="Generated"
           value={analytics.content_generated}
         />
 
         <AnalyticsCard
-          title="Content Published"
+          title="Published"
           value={analytics.content_published}
         />
 
         <AnalyticsCard
-          title="Avg Readability"
+          title="Readability"
           value={analytics.average_readability}
         />
 
         <AnalyticsCard
-          title="Avg Brand Alignment"
+          title="Brand"
           value={analytics.average_brand_alignment}
         />
 
         <AnalyticsCard
-          title="Avg Groundedness"
+          title="Groundedness"
           value={analytics.average_groundedness}
+        />
+
+      </div>
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+
+        <ContentMetricsChart
+          analytics={analytics}
+        />
+
+        <QualityMetricsChart
+          analytics={analytics}
+        />
+
+      </div>
+
+      <div className="mt-8">
+
+        <InsightsCard
+          analytics={analytics}
         />
 
       </div>
