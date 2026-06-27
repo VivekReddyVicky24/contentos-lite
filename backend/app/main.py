@@ -36,6 +36,9 @@ from app.api.evaluation import (
 from app.api.publish import (
     router as publish_router,
 )
+from app.api.analytics import (
+    router as analytics_router,
+)
 
 
 
@@ -132,6 +135,10 @@ app.include_router(
 
 app.include_router(
     publish_router
+)
+
+app.include_router(
+    analytics_router
 )
 
 @app.get("/")
