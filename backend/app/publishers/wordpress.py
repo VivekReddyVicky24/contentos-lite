@@ -13,8 +13,11 @@ class WordPressPublisher(
         content: str,
     ):
 
+        # TODO:
+        # Integrate WordPress XML-RPC
+
         return {
             "platform": "wordpress",
-            "status": "stub",
+            "status": "scheduled",
             "title": title,
         }

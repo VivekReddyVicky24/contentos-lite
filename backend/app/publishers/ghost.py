@@ -13,8 +13,11 @@ class GhostPublisher(
         content: str,
     ):
 
+        # TODO:
+        # Integrate Ghost Admin API
+
         return {
             "platform": "ghost",
-            "status": "stub",
+            "status": "scheduled",
             "title": title,
         }

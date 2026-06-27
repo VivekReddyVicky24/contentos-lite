@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -7,7 +9,11 @@ class PublishRequest(
 
     workspace_id: str
 
-    platform: str
+    platform: Literal[
+        "medium",
+        "wordpress",
+        "ghost",
+    ]
 
     title: str
 

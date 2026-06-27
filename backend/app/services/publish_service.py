@@ -47,12 +47,21 @@ def publish_content(
             "title":
                 title,
 
+            "content":
+                content,
+
             "status":
                 result["status"],
+
+            "published_url":
+                result.get(
+                    "url"
+                ),
         }
     ).execute()
 
     return result
+
 
 def get_publications(
     workspace_id: str,

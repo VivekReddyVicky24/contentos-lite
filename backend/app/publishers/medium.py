@@ -13,8 +13,11 @@ class MediumPublisher(
         content: str,
     ):
 
+        # TODO:
+        # Integrate Medium API
+
         return {
             "platform": "medium",
-            "status": "stub",
+            "status": "scheduled",
             "title": title,
         }
