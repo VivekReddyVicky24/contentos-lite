@@ -9,4 +9,6 @@ export interface Evaluation {
   groundedness: number;
 
   created_at: string;
+
+  overall_score: number;
 }

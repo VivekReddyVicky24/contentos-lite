@@ -9,13 +9,16 @@ export default function EvaluationCard({
 }: Props) {
   return (
     <div className="rounded-xl border p-6 shadow-sm">
-
       <h3 className="mb-4 text-lg font-semibold">
         Evaluation Report
       </h3>
 
-      <div className="space-y-2">
+      <div className="mb-4 text-2xl font-bold">
+        Overall:{" "}
+        {evaluation.overall_score}/100
+      </div>
 
+      <div className="space-y-2">
         <div>
           Readability:
           <span className="ml-2 font-bold">
@@ -36,9 +39,7 @@ export default function EvaluationCard({
             {evaluation.groundedness}/100
           </span>
         </div>
-
       </div>
-
     </div>
   );
 }

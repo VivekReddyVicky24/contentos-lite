@@ -5,7 +5,6 @@ def save_evaluation(
     workspace_id: str,
     evaluation: dict,
 ):
-
     return (
         supabase
         .table("evaluations")
@@ -24,6 +23,10 @@ def save_evaluation(
                     "groundedness",
                     0,
                 ),
+                "overall_score": evaluation.get(
+                    "overall_score",
+                    0,
+                ),
             }
         )
         .execute()
@@ -33,7 +36,6 @@ def save_evaluation(
 def get_workspace_evaluations(
     workspace_id: str,
 ):
-
     response = (
         supabase
         .table("evaluations")
