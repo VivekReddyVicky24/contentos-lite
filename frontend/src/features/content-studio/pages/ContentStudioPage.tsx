@@ -1,5 +1,13 @@
 import { useState } from "react";
 
+import {
+  useWorkspace,
+} from "@/features/workspace/context/WorkspaceContext";
+
+import {
+  runPipeline,
+} from "../services/agentService";
+
 import TopicForm from "../components/TopicForm";
 import AgentTimeline from "../components/AgentTimeline";
 import DraftPreview from "../components/DraftPreview";
@@ -9,6 +17,10 @@ import type {
 } from "../types/contentStudio";
 
 export default function ContentStudioPage() {
+
+  const {
+    workspace,
+  } = useWorkspace();
 
   const [loading, setLoading] =
     useState(false);
@@ -22,21 +34,45 @@ export default function ContentStudioPage() {
     topic: string,
   ) {
 
-    // IMPORTANT:
-    // No API calls yet.
-    // Phase 5I will enable this.
+    if (!workspace) {
 
-    console.log(
-      "Generate clicked:",
-      topic,
-    );
+      alert(
+        "No workspace selected.",
+      );
 
-    alert(
-      "Pipeline execution will be enabled in Phase 5I.",
-    );
+      return;
+    }
+
+    try {
+
+      setLoading(true);
+
+      const response =
+        await runPipeline(
+          topic,
+          workspace.id,
+        );
+
+      setResult(response);
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Pipeline execution failed.",
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
   }
 
   return (
+
     <div className="mx-auto max-w-7xl p-8">
 
       <h1 className="mb-8 text-4xl font-bold">
@@ -69,5 +105,6 @@ export default function ContentStudioPage() {
       </div>
 
     </div>
+
   );
 }

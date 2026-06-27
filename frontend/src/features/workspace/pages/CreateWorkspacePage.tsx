@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   useAuth,
-} from "@/features/auth/context/AuthContext";
+} from "@/features/auth/context/useAuth";
 
 import {
   createWorkspace,
@@ -11,7 +11,7 @@ import {
 
 import {
   useWorkspace,
-} from "../context/WorkspaceContext";
+} from "../context/useWorkspace";
 
 export default function CreateWorkspacePage() {
   const { user } = useAuth();

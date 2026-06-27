@@ -1,32 +1,18 @@
 import {
-  createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 
-import { useAuth } from "@/features/auth/context/AuthContext";
+import { useAuth } from "@/features/auth/context/useAuth";
 import { getWorkspaces } from "../services/workspaceService";
-
-interface Workspace {
-  id: string;
-  name: string;
-  slug: string;
-  owner_id: string;
-}
-
-interface WorkspaceContextType {
-  workspace: Workspace | null;
-  loading: boolean;
-  refreshWorkspace: () => Promise<void>;
-}
-
-const WorkspaceContext =
-  createContext<WorkspaceContextType>({
-    workspace: null,
-    loading: true,
-    refreshWorkspace: async () => {},
-  });
+import {
+  WorkspaceContext,
+} from "./workspace-context";
+import type {
+  Workspace,
+} from "./workspace-context";
 
 export function WorkspaceProvider({
   children,
@@ -34,6 +20,7 @@ export function WorkspaceProvider({
   children: React.ReactNode;
 }) {
   const { user } = useAuth();
+  const userId = user?.id ?? null;
 
   const [workspace, setWorkspace] =
     useState<Workspace | null>(null);
@@ -41,41 +28,68 @@ export function WorkspaceProvider({
   const [loading, setLoading] =
     useState(true);
 
-  async function refreshWorkspace() {
-    if (!user) {
-      setWorkspace(null);
-      setLoading(false);
-      return;
-    }
+  const [loadedUserId, setLoadedUserId] =
+    useState<string | null>(null);
 
-    setLoading(true);
-
-    try {
-      const workspaces =
-        await getWorkspaces(user.id);
-
-      if (
-        workspaces &&
-        workspaces.length > 0
-      ) {
-        setWorkspace(workspaces[0]);
-      } else {
+  const loadWorkspace =
+    useCallback(async (showLoading: boolean) => {
+      if (!userId) {
         setWorkspace(null);
+        setLoadedUserId(null);
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error(error);
-      setWorkspace(null);
-    } finally {
-      setLoading(false);
-    }
-  }
+
+      if (showLoading) {
+        setLoading(true);
+      }
+
+      try {
+        const workspaces =
+          await getWorkspaces(userId);
+
+        if (
+          workspaces &&
+          workspaces.length > 0
+        ) {
+          setWorkspace(workspaces[0]);
+        } else {
+          setWorkspace(null);
+        }
+      } catch (error) {
+        console.error(error);
+        setWorkspace(null);
+      } finally {
+        setLoadedUserId(userId);
+        setLoading(false);
+      }
+    }, [userId]);
+
+  const refreshWorkspace =
+    useCallback(async () => {
+      await loadWorkspace(
+        loadedUserId !== userId
+      );
+    }, [
+      loadedUserId,
+      loadWorkspace,
+      userId,
+    ]);
 
   useEffect(() => {
-    if (user) {
-      refreshWorkspace();
-    }
-  }, [user]);
 
+  if (!userId) {
+    setWorkspace(null);
+    setLoading(false);
+    return;
+  }
+
+  void loadWorkspace(true);
+
+}, [userId, loadWorkspace]);
+console.log("USER:", userId);
+console.log("WORKSPACE:", workspace);
+console.log("LOADING:", loading);
   return (
     <WorkspaceContext.Provider
       value={{
@@ -88,6 +102,5 @@ export function WorkspaceProvider({
     </WorkspaceContext.Provider>
   );
 }
-
 export const useWorkspace = () =>
   useContext(WorkspaceContext);

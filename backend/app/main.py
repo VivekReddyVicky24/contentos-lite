@@ -27,6 +27,9 @@ from app.api.brand_brain_stream import (
 from app.api.agents import (
     router as agent_router,
 )
+from app.api.brand import (
+    router as brand_router,
+)
 
 
 
@@ -113,6 +116,11 @@ app.include_router(
     prefix="/agents",
     tags=["Agents"],
 )
+
+app.include_router(
+    brand_router
+)
+
 
 @app.get("/")
 def root():

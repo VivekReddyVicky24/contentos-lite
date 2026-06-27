@@ -1,4 +1,8 @@
 import AppRouter from "./app/AppRouter";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 import {
   AuthProvider,
@@ -8,13 +12,17 @@ import {
   WorkspaceProvider,
 } from "@/features/workspace/context/WorkspaceContext";
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <AuthProvider>
-      <WorkspaceProvider>
-        <AppRouter />
-      </WorkspaceProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <WorkspaceProvider>
+          <AppRouter />
+        </WorkspaceProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

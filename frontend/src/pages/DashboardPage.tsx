@@ -3,7 +3,7 @@ import LogoutButton from "@/components/LogoutButton";
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context/useWorkspace";
 
 export default function DashboardPage() {
   const { workspace } =
@@ -52,6 +52,10 @@ export default function DashboardPage() {
           <Link to="/content-studio">
   Content Studio
 </Link>
+            <p>0</p>
+          <Link to="/brand-setup">
+            Brand Setup
+          </Link>
         </div>
       </div>
     </div>

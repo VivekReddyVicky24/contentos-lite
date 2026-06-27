@@ -5,12 +5,15 @@ import SignupPage from "@/features/auth/pages/SignupPage";
 import CreateWorkspacePage from "@/features/workspace/pages/CreateWorkspacePage";
 import DashboardPage from "@/pages/DashboardPage";
 import BrandBrainPage from "@/features/brand-brain/pages/BrandBrainPage";
+import BrandProfilePage from "@/pages/BrandProfilePage";
 
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import WorkspaceGuard from "@/routes/WorkspaceGuard";
 
 import DocumentsPage from "@/features/documents/pages/DocumentsPage";
 import ContentStudioPage from "@/features/content-studio/pages/ContentStudioPage";
+
+import BrandSetupPage from "@/features/brand/pages/BrandSetupPage";
 
 export default function AppRouter() {
   return (
@@ -56,12 +59,34 @@ export default function AppRouter() {
         />
 
         <Route
+          path="/brand-memory"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <BrandProfilePage />
+              </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/content-studio"
           element={
             <ProtectedRoute>
               <WorkspaceGuard>
                 <ContentStudioPage />
               </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/brand-setup"
+          element={
+            <ProtectedRoute>
+              {/* <WorkspaceGuard> */}
+                <BrandSetupPage />
+              {/* </WorkspaceGuard> */}
             </ProtectedRoute>
           }
         />

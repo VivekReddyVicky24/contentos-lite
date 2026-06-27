@@ -10,6 +10,11 @@ from app.agents.prompts.research_prompt import (
     RESEARCH_PROMPT,
 )
 
+from app.agents.prompts.brand_context import (
+    build_brand_context,
+)
+
+
 load_dotenv()
 
 
@@ -24,20 +29,29 @@ llm = ChatGoogleGenerativeAI(
 def research_node(
     state,
 ):
-    prompt = RESEARCH_PROMPT.format(
-        topic=state["topic"]
+    brand_context = build_brand_context(
+        state.get(
+            "brand_profile",
+            {},
+        )
     )
+
+    prompt = f"""
+{brand_context}
+
+Research this topic:
+
+{state['topic']}
+"""
 
     response = llm.invoke(
         prompt
     )
 
     return {
-    "research": response.content,
-
-    "current_agent":
-        "research",
-
-    "execution_log":
-        ["research: completed"],
-}
+        "research": response.content,
+        "current_agent": "research",
+        "execution_log": [
+            "research: completed"
+        ],
+    }

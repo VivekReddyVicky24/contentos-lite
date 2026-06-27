@@ -1,29 +1,14 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useState,
 } from "react";
 
 import type {
   Session,
-  User,
 } from "@supabase/supabase-js";
 
 import { supabase } from "@/lib/supabase";
-
-interface AuthContextType {
-  session: Session | null;
-  user: User | null;
-  loading: boolean;
-}
-
-const AuthContext =
-  createContext<AuthContextType>({
-    session: null,
-    user: null,
-    loading: true,
-  });
+import { AuthContext } from "./auth-context";
 
 export function AuthProvider({
   children,
@@ -73,6 +58,3 @@ export function AuthProvider({
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () =>
-  useContext(AuthContext);

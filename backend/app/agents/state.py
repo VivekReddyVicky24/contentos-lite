@@ -2,7 +2,10 @@ from typing import Literal, TypedDict
 
 
 class ContentState(TypedDict):
+
     topic: str
+
+    brand_profile: dict
 
     research: str
 

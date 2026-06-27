@@ -10,6 +10,9 @@ from langchain_google_genai import (
 from app.agents.prompts.planner_prompt import (
     PLANNER_PROMPT,
 )
+from app.agents.prompts.brand_context import (
+    build_brand_context,
+)
 
 load_dotenv()
 
@@ -24,9 +27,20 @@ llm = ChatGoogleGenerativeAI(
 
 def planner_node(state):
 
-    prompt = PLANNER_PROMPT.format(
-        research=state["research"]
+    brand_context = build_brand_context(
+        state.get(
+            "brand_profile",
+            {},
+        )
     )
+
+    prompt = f"""
+    {brand_context}
+
+    {PLANNER_PROMPT.format(
+        research=state["research"]
+    )}
+    """
 
     response = llm.invoke(prompt)
 

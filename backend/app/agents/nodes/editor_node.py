@@ -11,6 +11,10 @@ from app.agents.prompts.editor_prompt import (
     EDITOR_PROMPT,
 )
 
+from app.agents.prompts.brand_context import (
+    build_brand_context,
+)
+
 load_dotenv()
 
 
@@ -24,12 +28,23 @@ llm = ChatGoogleGenerativeAI(
 
 def editor_node(state):
 
-    prompt = EDITOR_PROMPT.format(
-        draft=json.dumps(
-            state["draft"],
-            indent=2,
+    brand_context = build_brand_context(
+        state.get(
+            "brand_profile",
+            {},
         )
     )
+
+    prompt = f"""
+{brand_context}
+
+{EDITOR_PROMPT.format(
+    draft=json.dumps(
+        state["draft"],
+        indent=2,
+    )
+)}
+"""
 
     response = llm.invoke(prompt)
 
@@ -47,22 +62,19 @@ def editor_node(state):
     except Exception as e:
 
         print("EDITOR ERROR:", e)
+        print(response.content)
 
         edited = {
             "title": "",
-
             "introduction": "",
-
             "sections": [],
-
             "conclusion": "",
-
             "call_to_action": "",
-
             "editor_notes": [
                 "Editing failed"
             ],
         }
+
     logs = state.get(
         "execution_log",
         []
@@ -71,16 +83,12 @@ def editor_node(state):
     logs.append(
         "editor: completed"
     )
+
     return {
-    "edited_draft":
-        edited,
-
-    "current_agent":
-        "editor",
-
-    "execution_log":
-        logs,
-}
+        "edited_draft": edited,
+        "current_agent": "editor",
+        "execution_log": logs,
+    }
 
 
 # TODO:

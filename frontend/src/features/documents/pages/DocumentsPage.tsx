@@ -1,16 +1,25 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context/useWorkspace";
 
 import {
   uploadDocument,
   getDocuments,
 } from "../services/documentService";
+
+interface DocumentItem {
+  id: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  processing_status: string;
+}
 
 function statusColor(
   status: string,
@@ -37,12 +46,13 @@ export default function DocumentsPage() {
     useState<File | null>(null);
 
   const [documents, setDocuments] =
-    useState<any[]>([]);
+    useState<DocumentItem[]>([]);
 
   const [loading, setLoading] =
     useState(false);
 
-  async function loadDocuments() {
+  const loadDocuments =
+    useCallback(async () => {
     if (!workspace) return;
 
     const docs =
@@ -51,11 +61,17 @@ export default function DocumentsPage() {
       );
 
     setDocuments(docs);
-  }
+  }, [workspace]);
 
   useEffect(() => {
-    loadDocuments();
-  }, [workspace]);
+    const refreshTimer = window.setTimeout(() => {
+      void loadDocuments();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(refreshTimer);
+    };
+  }, [loadDocuments]);
 
   async function handleUpload() {
     if (!file || !workspace) return;

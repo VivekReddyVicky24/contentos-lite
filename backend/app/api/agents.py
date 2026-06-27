@@ -7,37 +7,45 @@ from app.agents.graph import (
     graph,
 )
 
+from app.services.brand_service import (
+    get_brand_profile_for_agent,
+)
+
 router = APIRouter()
 
 
-class AgentRequest(
+class ResearchRequest(
     BaseModel,
 ):
     topic: str
-
-
-
+    workspace_id: str
 
 
 @router.post("/research")
-async def research(request: AgentRequest):
-
+async def research(
+    request: ResearchRequest,
+):
     try:
+
+        brand_profile = (
+            get_brand_profile_for_agent(
+                request.workspace_id
+            )
+        )
 
         result = graph.invoke(
             {
                 "topic": request.topic,
+                "brand_profile": brand_profile,
             }
         )
 
         return result
 
     except HTTPException:
-
         raise
 
     except Exception as e:
-
         raise HTTPException(
             status_code=429,
             detail=str(e),

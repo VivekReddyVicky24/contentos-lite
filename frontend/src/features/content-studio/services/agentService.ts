@@ -10,6 +10,7 @@ const API_URL =
 
 export async function runPipeline(
   topic: string,
+  workspaceId: string,
 ): Promise<AgentResponse> {
 
   const response =
@@ -17,6 +18,7 @@ export async function runPipeline(
       `${API_URL}/agents/research`,
       {
         topic,
+        workspace_id: workspaceId,
       },
     );
 

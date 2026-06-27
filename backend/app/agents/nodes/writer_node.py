@@ -11,11 +11,13 @@ from app.agents.prompts.writer_prompt import (
     WRITER_PROMPT,
 )
 
+from app.agents.prompts.brand_context import (
+    build_brand_context,
+)
+
 load_dotenv()
 
 
-# We won't test yet,
-# so keeping the same model is fine.
 llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-lite",
     google_api_key=os.getenv(
@@ -26,21 +28,29 @@ llm = ChatGoogleGenerativeAI(
 
 def writer_node(state):
 
-    prompt = WRITER_PROMPT.format(
-        topic=state["topic"],
-
-        research=state["research"],
-
-        plan=json.dumps(
-            state["plan"],
-            indent=2,
-        ),
-
-        seo=json.dumps(
-            state["seo"],
-            indent=2,
-        ),
+    brand_context = build_brand_context(
+        state.get(
+            "brand_profile",
+            {},
+        )
     )
+
+    prompt = f"""
+{brand_context}
+
+{WRITER_PROMPT.format(
+    topic=state["topic"],
+    research=state["research"],
+    plan=json.dumps(
+        state["plan"],
+        indent=2,
+    ),
+    seo=json.dumps(
+        state["seo"],
+        indent=2,
+    ),
+)}
+"""
 
     response = llm.invoke(prompt)
 
@@ -58,18 +68,16 @@ def writer_node(state):
     except Exception as e:
 
         print("WRITER ERROR:", e)
+        print(response.content)
 
         draft = {
             "title": "",
-
             "introduction": "",
-
             "sections": [],
-
             "conclusion": "",
-
             "call_to_action": "",
         }
+
     logs = state.get(
         "execution_log",
         []
@@ -80,14 +88,10 @@ def writer_node(state):
     )
 
     return {
-    "draft": draft,
-
-    "current_agent":
-        "writer",
-
-    "execution_log":
-        logs,
-}
+        "draft": draft,
+        "current_agent": "writer",
+        "execution_log": logs,
+    }
 
 
 # TODO:

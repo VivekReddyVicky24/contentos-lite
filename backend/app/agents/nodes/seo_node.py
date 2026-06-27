@@ -10,6 +10,9 @@ from langchain_google_genai import (
 from app.agents.prompts.seo_prompt import (
     SEO_PROMPT,
 )
+from app.agents.prompts.brand_context import (
+    build_brand_context,
+)
 
 load_dotenv()
 
@@ -24,14 +27,25 @@ llm = ChatGoogleGenerativeAI(
 
 def seo_node(state):
 
-    prompt = SEO_PROMPT.format(
-        topic=state["topic"],
-        research=state["research"],
-        plan=json.dumps(
-            state["plan"],
-            indent=2,
-        ),
+    brand_context = build_brand_context(
+        state.get(
+            "brand_profile",
+            {},
+        )
     )
+
+    prompt = f"""
+{brand_context}
+
+{SEO_PROMPT.format(
+    topic=state["topic"],
+    research=state["research"],
+    plan=json.dumps(
+        state["plan"],
+        indent=2,
+    ),
+)}
+"""
 
     response = llm.invoke(prompt)
 
@@ -60,6 +74,7 @@ def seo_node(state):
             "meta_description": "",
             "internal_link_ideas": [],
         }
+
     logs = state.get(
         "execution_log",
         []
@@ -67,14 +82,10 @@ def seo_node(state):
 
     logs.append(
         "seo: completed"
-    )    
+    )
 
     return {
-    "seo": seo,
-
-    "current_agent":
-        "seo",
-
-    "execution_log":
-        logs,
+        "seo": seo,
+        "current_agent": "seo",
+        "execution_log": logs,
     }
