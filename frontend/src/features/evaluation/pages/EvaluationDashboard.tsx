@@ -7,6 +7,9 @@ import {
   useWorkspace,
 } from "@/features/workspace/context/WorkspaceContext";
 
+import EvaluationCard from "../components/EvaluationCard";
+import EvaluationTrendChart from "../components/EvaluationTrendChart";
+
 import {
   getEvaluations,
 } from "../services/evaluationService";
@@ -45,42 +48,24 @@ export default function EvaluationDashboard() {
 
   return (
 
-    <div className="mx-auto max-w-6xl p-8">
+    <div className="mx-auto max-w-7xl p-8">
 
       <h1 className="mb-8 text-4xl font-bold">
         Evaluation Dashboard
       </h1>
 
-      <div className="space-y-4">
+      <EvaluationTrendChart
+        evaluations={evaluations}
+      />
+
+      <div className="mt-8 space-y-4">
 
         {evaluations.map(
           (evaluation) => (
-
-            <div
+            <EvaluationCard
               key={evaluation.id}
-              className="rounded-xl border p-6"
-            >
-
-              <p>
-                Readability:
-                {" "}
-                {evaluation.readability}
-              </p>
-
-              <p>
-                Brand Alignment:
-                {" "}
-                {evaluation.brand_alignment}
-              </p>
-
-              <p>
-                Groundedness:
-                {" "}
-                {evaluation.groundedness}
-              </p>
-
-            </div>
-
+              evaluation={evaluation}
+            />
           ),
         )}
 
