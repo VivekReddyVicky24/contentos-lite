@@ -72,7 +72,7 @@ export default function AnalyticsDashboard() {
         Analytics Dashboard
       </h1>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
 
         <AnalyticsCard
           title="Generated"
@@ -97,6 +97,11 @@ export default function AnalyticsDashboard() {
         <AnalyticsCard
           title="Groundedness"
           value={analytics.average_groundedness}
+        />
+
+        <AnalyticsCard
+          title="Overall"
+          value={analytics.average_overall_score}
         />
 
       </div>

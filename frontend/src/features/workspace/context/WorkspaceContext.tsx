@@ -1,106 +1,159 @@
 import {
+  createContext,
   useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 
+import type { ReactNode } from "react";
+
 import { useAuth } from "@/features/auth/context/useAuth";
 import { getWorkspaces } from "../services/workspaceService";
-import {
-  WorkspaceContext,
-} from "./workspace-context";
-import type {
-  Workspace,
-} from "./workspace-context";
+
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id: string;
+}
+
+interface WorkspaceContextType {
+  workspace: Workspace | null;
+  loading: boolean;
+  refreshWorkspace: () => Promise<void>;
+  setWorkspace: (
+    workspace: Workspace | null,
+  ) => void;
+}
+
+const WorkspaceContext =
+  createContext<WorkspaceContextType>({
+    workspace: null,
+    loading: true,
+    refreshWorkspace: async () => {},
+    setWorkspace: () => {},
+  });
+
+const STORAGE_KEY =
+  "contentcrew:selected-workspace";
 
 export function WorkspaceProvider({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const { user } = useAuth();
-  const userId = user?.id ?? null;
 
-  const [workspace, setWorkspace] =
+  const [workspace, setWorkspaceState] =
     useState<Workspace | null>(null);
 
   const [loading, setLoading] =
     useState(true);
 
-  const [loadedUserId, setLoadedUserId] =
-    useState<string | null>(null);
+  const setWorkspace = (
+    value: Workspace | null,
+  ) => {
+    setWorkspaceState(value);
+
+    if (value) {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(value),
+      );
+    } else {
+      localStorage.removeItem(
+        STORAGE_KEY,
+      );
+    }
+  };
 
   const loadWorkspace =
-    useCallback(async (showLoading: boolean) => {
-      if (!userId) {
+    useCallback(async () => {
+      if (!user?.id) {
         setWorkspace(null);
-        setLoadedUserId(null);
         setLoading(false);
         return;
       }
 
-      if (showLoading) {
-        setLoading(true);
-      }
-
       try {
+        setLoading(true);
+
         const workspaces =
-          await getWorkspaces(userId);
+          await getWorkspaces(
+            user.id,
+          );
 
         if (
-          workspaces &&
-          workspaces.length > 0
+          !workspaces ||
+          workspaces.length === 0
         ) {
-          setWorkspace(workspaces[0]);
-        } else {
           setWorkspace(null);
+          return;
         }
+
+        const savedWorkspace =
+          localStorage.getItem(
+            STORAGE_KEY,
+          );
+
+        if (savedWorkspace) {
+          const parsed =
+            JSON.parse(
+              savedWorkspace,
+            );
+
+          const existing =
+            workspaces.find(
+              (w) =>
+                w.id === parsed.id,
+            );
+
+          if (existing) {
+            setWorkspace(existing);
+            return;
+          }
+        }
+
+        setWorkspace(
+          workspaces[0],
+        );
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Workspace load failed:",
+          error,
+        );
+
         setWorkspace(null);
       } finally {
-        setLoadedUserId(userId);
         setLoading(false);
       }
-    }, [userId]);
+    }, [user]);
 
   const refreshWorkspace =
     useCallback(async () => {
-      await loadWorkspace(
-        loadedUserId !== userId
-      );
-    }, [
-      loadedUserId,
-      loadWorkspace,
-      userId,
-    ]);
+      await loadWorkspace();
+    }, [loadWorkspace]);
 
   useEffect(() => {
+    void loadWorkspace();
+  }, [loadWorkspace]);
 
-  if (!userId) {
-    setWorkspace(null);
-    setLoading(false);
-    return;
-  }
-
-  void loadWorkspace(true);
-
-}, [userId, loadWorkspace]);
-console.log("USER:", userId);
-console.log("WORKSPACE:", workspace);
-console.log("LOADING:", loading);
   return (
     <WorkspaceContext.Provider
       value={{
         workspace,
         loading,
         refreshWorkspace,
+        setWorkspace,
       }}
     >
       {children}
     </WorkspaceContext.Provider>
   );
 }
+
 export const useWorkspace = () =>
-  useContext(WorkspaceContext);
+  useContext(
+    WorkspaceContext,
+  );

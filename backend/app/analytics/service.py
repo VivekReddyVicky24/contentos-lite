@@ -30,6 +30,14 @@ def get_workspace_analytics(
         .execute()
     ).data
 
+    overall_scores = [
+        e.get(
+            "overall_score",
+            0,
+        )
+        for e in evaluations
+    ]
+
     return {
         "content_generated":
             len(evaluations),
@@ -59,5 +67,10 @@ def get_workspace_analytics(
                     e["groundedness"]
                     for e in evaluations
                 ]
+            ),
+
+        "average_overall_score":
+            calculate_average(
+                overall_scores
             ),
     }

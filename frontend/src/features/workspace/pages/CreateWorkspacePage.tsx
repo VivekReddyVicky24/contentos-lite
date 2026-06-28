@@ -11,7 +11,7 @@ import {
 
 import {
   useWorkspace,
-} from "../context/useWorkspace";
+} from "../context/WorkspaceContext";
 
 export default function CreateWorkspacePage() {
   const { user } = useAuth();

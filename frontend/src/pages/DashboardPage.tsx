@@ -3,7 +3,7 @@ import LogoutButton from "@/components/LogoutButton";
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/useWorkspace";
+} from "@/features/workspace/context/WorkspaceContext";
 
 export default function DashboardPage() {
   const { workspace } =

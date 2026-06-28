@@ -98,9 +98,9 @@ export default function AppRouter() {
           path="/brand-setup"
           element={
             <ProtectedRoute>
-              {/* <WorkspaceGuard> */}
-              <BrandSetupPage />
-              {/* </WorkspaceGuard> */}
+              <WorkspaceGuard>
+                <BrandSetupPage />
+              </WorkspaceGuard>
             </ProtectedRoute>
           }
         />
@@ -120,7 +120,9 @@ export default function AppRouter() {
           path="/publishing"
           element={
             <ProtectedRoute>
-              <PublishingDashboard />
+              <WorkspaceGuard>
+                <PublishingDashboard />
+              </WorkspaceGuard>
             </ProtectedRoute>
           }
         />
@@ -129,9 +131,9 @@ export default function AppRouter() {
           path="/analytics"
           element={
             <ProtectedRoute>
-              {/* <WorkspaceGuard> */}
+              <WorkspaceGuard>
                 <AnalyticsDashboard />
-              {/* </WorkspaceGuard> */}
+              </WorkspaceGuard>
             </ProtectedRoute>
           }
         />

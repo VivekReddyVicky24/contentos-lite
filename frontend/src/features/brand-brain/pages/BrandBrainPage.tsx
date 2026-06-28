@@ -4,9 +4,7 @@ import {
   useState,
 } from "react";
 
-import {
-  useWorkspace,
-} from "@/features/workspace/context/useWorkspace";
+import { useWorkspace } from "@/features/workspace/context/WorkspaceContext";
 
 import {
   streamBrandBrain,
