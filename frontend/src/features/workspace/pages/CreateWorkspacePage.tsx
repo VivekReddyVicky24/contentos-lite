@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   useAuth,
@@ -11,7 +14,7 @@ import {
 
 import {
   useWorkspace,
-} from "../context/WorkspaceContext";
+} from "../context";
 
 export default function CreateWorkspacePage() {
   const { user } = useAuth();
@@ -19,7 +22,10 @@ export default function CreateWorkspacePage() {
   const navigate = useNavigate();
 
   const {
-    refreshWorkspace,
+    loading: workspaceLoading,
+    status,
+    error,
+    setWorkspace,
   } = useWorkspace();
 
   const [name, setName] =
@@ -29,22 +35,30 @@ export default function CreateWorkspacePage() {
     useState(false);
 
   async function handleCreate() {
-    if (!user) return;
+    const trimmedName =
+      name.trim();
+
+    if (!user || !trimmedName) {
+      return;
+    }
 
     try {
       setLoading(true);
 
-      const slug = name
+      const slug = trimmedName
         .toLowerCase()
         .replace(/\s+/g, "-");
 
-      await createWorkspace(
-        name,
+      const createdWorkspace =
+        await createWorkspace(
+        trimmedName,
         slug,
         user.id
       );
 
-      await refreshWorkspace();
+      setWorkspace(
+        createdWorkspace,
+      );
 
       navigate("/");
     } catch (error) {
@@ -52,6 +66,40 @@ export default function CreateWorkspacePage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (status === "ready") {
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
+  }
+
+  if (workspaceLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading workspace...
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-md space-y-2">
+          <h1 className="text-2xl font-bold">
+            Workspace unavailable
+          </h1>
+
+          <p className="text-muted-foreground">
+            {error?.message ??
+              "Unable to load your workspace."}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

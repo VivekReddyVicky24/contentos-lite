@@ -10,7 +10,7 @@ import {
 
 import type { BrandFormValues } from "@/schemas/brandSchema";
 
-import { useWorkspace } from "@/features/workspace/context/WorkspaceContext";
+import { useWorkspace } from "@/features/workspace/context";
 
 export default function BrandProfilePage() {
   const { workspace } = useWorkspace();

@@ -36,7 +36,11 @@ export default function AppRouter() {
 
         <Route
           path="/create-workspace"
-          element={<CreateWorkspacePage />}
+          element={
+            <ProtectedRoute>
+              <CreateWorkspacePage />
+            </ProtectedRoute>
+          }
         />
 
         <Route

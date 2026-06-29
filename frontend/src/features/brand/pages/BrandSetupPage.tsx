@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { useWorkspace }
-from "@/features/workspace/context/WorkspaceContext";
+from "@/features/workspace/context";
 
 import {
   createBrandProfile,

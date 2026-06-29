@@ -1,10 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
+import type { Workspace } from "../types/workspace";
+
 export async function createWorkspace(
   name: string,
   slug: string,
   ownerId: string
-) {
+): Promise<Workspace> {
   const { data, error } =
     await supabase
       .from("workspaces")
@@ -23,12 +25,15 @@ export async function createWorkspace(
 
 export async function getWorkspaces(
   userId: string
-) {
+): Promise<Workspace[]> {
   const { data, error } =
     await supabase
       .from("workspaces")
       .select("*")
-      .eq("owner_id", userId);
+      .eq("owner_id", userId)
+      .order("created_at", {
+        ascending: true,
+      });
 
   if (error) throw error;
 
@@ -37,7 +42,7 @@ export async function getWorkspaces(
 
 export async function getWorkspaceById(
   workspaceId: string
-) {
+): Promise<Workspace> {
   const { data, error } =
     await supabase
       .from("workspaces")

@@ -1,11 +1,12 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context";
 
 import PublishForm from "../components/PublishForm";
 
@@ -31,26 +32,30 @@ export default function PublishingDashboard() {
   ] = useState<Publication[]>([]);
 
 
-  async function refresh() {
+  const refresh =
+    useCallback(async () => {
 
-    if (!workspace) {
-      return;
-    }
+      if (!workspace) {
+        setPublications([]);
+        return;
+      }
 
-    const data =
-      await getPublications(
-        workspace.id,
-      );
+      const data =
+        await getPublications(
+          workspace.id,
+        );
 
-    setPublications(data);
-  }
+      setPublications(data);
+    }, [workspace]);
 
 
   useEffect(() => {
 
-    void refresh();
+    void Promise.resolve().then(
+      refresh,
+    );
 
-  }, [workspace]);
+  }, [refresh]);
 
 
   async function handlePublish(

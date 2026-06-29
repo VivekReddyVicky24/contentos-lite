@@ -5,7 +5,7 @@ import {
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context";
 
 import EvaluationCard from "../components/EvaluationCard";
 import EvaluationTrendChart from "../components/EvaluationTrendChart";

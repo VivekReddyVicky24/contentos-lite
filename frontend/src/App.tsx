@@ -10,7 +10,7 @@ import {
 
 import {
   WorkspaceProvider,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context";
 
 const queryClient = new QueryClient();
 

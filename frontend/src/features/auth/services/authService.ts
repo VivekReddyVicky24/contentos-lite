@@ -51,5 +51,12 @@ export async function signIn(
 }
 
 export async function signOut() {
+  localStorage.removeItem(
+    "contentcrew:selected-workspace-id"
+  );
+  localStorage.removeItem(
+    "contentcrew:selected-workspace"
+  );
+
   await supabase.auth.signOut();
 }

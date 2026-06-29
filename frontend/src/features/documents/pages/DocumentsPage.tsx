@@ -6,7 +6,7 @@ import {
 
 import {
   useWorkspace,
-} from "@/features/workspace/context/WorkspaceContext";
+} from "@/features/workspace/context";
 
 import {
   uploadDocument,
