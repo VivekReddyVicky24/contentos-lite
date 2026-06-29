@@ -1,12 +1,11 @@
 import os
 
-import google.generativeai as genai
-
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
-genai.configure(
+client = genai.Client(
     api_key=os.getenv(
         "GEMINI_API_KEY"
     )
@@ -17,10 +16,6 @@ def stream_grounded_response(
     question: str,
     context: str,
 ):
-
-    model = genai.GenerativeModel(
-        "gemini-2.5-flash"
-    )
 
     prompt = f"""
 You are ContentCrew's Brand Brain.
@@ -43,9 +38,9 @@ QUESTION:
 ANSWER:
 """
 
-    response = model.generate_content(
-        prompt,
-        stream=True,
+    response = client.models.generate_content_stream(
+        model="gemini-2.5-flash",
+        contents=prompt,
     )
 
     for chunk in response:

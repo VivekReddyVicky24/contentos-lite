@@ -1,11 +1,4 @@
 import json
-import os
-
-from dotenv import load_dotenv
-
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-)
 
 from app.agents.prompts.brand_context import (
     build_brand_context,
@@ -22,14 +15,8 @@ from app.guardrails.output_validator import (
 from app.services.evaluation_service import (
     save_evaluation,
 )
-
-load_dotenv()
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-lite",
-    google_api_key=os.getenv(
-        "GEMINI_API_KEY"
-    ),
+from app.services.llm_service import (
+    generate_text,
 )
 
 
@@ -53,12 +40,12 @@ def editor_node(state):
 )}
 """
 
-    response = llm.invoke(prompt)
+    response = generate_text(prompt)
 
     try:
 
         cleaned = (
-            response.content
+            response
             .replace("```json", "")
             .replace("```", "")
             .strip()
@@ -69,7 +56,7 @@ def editor_node(state):
     except Exception as e:
 
         print("EDITOR ERROR:", e)
-        print(response.content)
+        print(response)
 
         edited = {
             "title": "",

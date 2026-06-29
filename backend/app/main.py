@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.startup_checks import (
+    validate_environment,
+)
 from app.api.health import router as health_router
 from app.api.documents import router as document_router
 from app.api.pdf import router as pdf_router
@@ -41,6 +44,8 @@ from app.api.analytics import (
 )
 
 
+
+validate_environment()
 
 app = FastAPI(
     title="ContentCrew API",

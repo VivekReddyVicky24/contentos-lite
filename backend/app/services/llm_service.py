@@ -1,24 +1,33 @@
 import os
 
-import google.generativeai as genai
-
 from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
-genai.configure(
-    api_key=os.getenv("GEMINI_API_KEY")
+client = genai.Client(
+    api_key=os.getenv(
+        "GEMINI_API_KEY"
+    )
 )
+
+
+def generate_text(
+    prompt: str,
+) -> str:
+
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+    )
+
+    return response.text or ""
 
 
 def generate_grounded_response(
     question: str,
     context: str,
-):
-    model = genai.GenerativeModel(
-        "gemini-2.5-flash"
-    )
-
+) -> str:
     prompt = f"""
 You are ContentCrew's Brand Brain.
 
@@ -41,8 +50,4 @@ QUESTION:
 ANSWER:
 """
 
-    response = model.generate_content(
-        prompt
-    )
-
-    return response.text
+    return generate_text(prompt)

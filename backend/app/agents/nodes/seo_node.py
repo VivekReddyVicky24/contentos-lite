@@ -1,11 +1,4 @@
 import json
-import os
-
-from dotenv import load_dotenv
-
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-)
 
 from app.agents.prompts.seo_prompt import (
     SEO_PROMPT,
@@ -13,15 +6,8 @@ from app.agents.prompts.seo_prompt import (
 from app.agents.prompts.brand_context import (
     build_brand_context,
 )
-
-load_dotenv()
-
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-lite",
-    google_api_key=os.getenv(
-        "GEMINI_API_KEY"
-    ),
+from app.services.llm_service import (
+    generate_text,
 )
 
 
@@ -47,12 +33,12 @@ def seo_node(state):
 )}
 """
 
-    response = llm.invoke(prompt)
+    response = generate_text(prompt)
 
     try:
 
         cleaned = (
-            response.content
+            response
             .replace("```json", "")
             .replace("```", "")
             .strip()
@@ -64,7 +50,7 @@ def seo_node(state):
 
         print("SEO ERROR:", e)
 
-        print(response.content)
+        print(response)
 
         seo = {
             "primary_keyword": "",

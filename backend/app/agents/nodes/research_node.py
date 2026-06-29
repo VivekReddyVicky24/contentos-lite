@@ -1,28 +1,8 @@
-import os
-
-from dotenv import load_dotenv
-
-from langchain_google_genai import (
-    ChatGoogleGenerativeAI,
-)
-
-from app.agents.prompts.research_prompt import (
-    RESEARCH_PROMPT,
-)
-
 from app.agents.prompts.brand_context import (
     build_brand_context,
 )
-
-
-load_dotenv()
-
-
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash-lite",
-    google_api_key=os.getenv(
-        "GEMINI_API_KEY"
-    ),
+from app.services.llm_service import (
+    generate_text,
 )
 
 
@@ -44,12 +24,12 @@ Research this topic:
 {state['topic']}
 """
 
-    response = llm.invoke(
+    response = generate_text(
         prompt
     )
 
     return {
-        "research": response.content,
+        "research": response,
         "current_agent": "research",
         "execution_log": [
             "research: completed"
