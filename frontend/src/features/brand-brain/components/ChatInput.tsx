@@ -1,6 +1,10 @@
 import {
   useState,
 } from "react";
+import { Send } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface Props {
   onSend: (
@@ -34,9 +38,9 @@ export default function ChatInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2"
+      className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row"
     >
-      <input
+      <Input
         value={question}
         onChange={(e) =>
           setQuestion(
@@ -44,17 +48,22 @@ export default function ChatInput({
           )
         }
         placeholder="Ask about your brand..."
-        className="flex-1 rounded-lg border p-3"
+        className="h-11 flex-1 border-0 shadow-none focus-visible:ring-0"
       />
 
-      <button
-        disabled={loading}
-        className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+      <Button
+        type="submit"
+        disabled={
+          loading ||
+          !question.trim()
+        }
+        className="h-11 shrink-0"
       >
+        <Send className="size-4" />
         {loading
-          ? "Brand Brain is thinking..."
+          ? "Thinking..."
           : "Send"}
-      </button>
+      </Button>
     </form>
   );
 }

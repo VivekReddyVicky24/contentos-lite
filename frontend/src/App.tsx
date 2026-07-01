@@ -11,6 +11,7 @@ import {
 import {
   WorkspaceProvider,
 } from "@/features/workspace/context";
+import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ function App() {
       <AuthProvider>
         <WorkspaceProvider>
           <AppRouter />
+          <Toaster />
         </WorkspaceProvider>
       </AuthProvider>
     </QueryClientProvider>

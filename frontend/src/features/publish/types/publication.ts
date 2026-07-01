@@ -8,5 +8,7 @@ export interface Publication {
 
   status: string;
 
+  published_url?: string | null;
+
   created_at: string;
 }

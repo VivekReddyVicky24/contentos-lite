@@ -8,13 +8,15 @@ export default function AnalyticsCard({
   value,
 }: Props) {
   return (
-    <div className="rounded-xl border p-6 shadow-sm">
-      <h3 className="text-sm text-gray-500">
+    <div className="rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm">
+      <h3 className="text-sm font-medium text-slate-500">
         {title}
       </h3>
 
-      <p className="mt-2 text-4xl font-bold">
-        {value}
+      <p className="mt-2 text-3xl font-bold text-slate-950">
+        {Number(value).toFixed(
+          Number.isInteger(value) ? 0 : 1,
+        )}
       </p>
     </div>
   );

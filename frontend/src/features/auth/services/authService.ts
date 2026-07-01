@@ -26,10 +26,9 @@ export async function signUp(
         role: "owner",
       });
 
-    console.log(
-      "PROFILE INSERT ERROR:",
-      profileError
-    );
+    if (profileError) {
+      throw profileError;
+    }
   }
 
   return data;

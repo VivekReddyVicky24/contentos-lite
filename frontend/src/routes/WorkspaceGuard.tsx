@@ -1,5 +1,7 @@
 import { Navigate } from "react-router-dom";
 
+import AppShell from "@/components/AppShell";
+
 import { useWorkspace } from
   "@/features/workspace/context";
 
@@ -56,5 +58,9 @@ export default function WorkspaceGuard({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <AppShell>
+      {children}
+    </AppShell>
+  );
 }

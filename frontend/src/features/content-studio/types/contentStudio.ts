@@ -19,6 +19,8 @@ export interface AgentResponse {
 
   execution_log: string[];
 
+  evaluation: Record<string, number>;
+
   failed: boolean;
 
   error_message: string;

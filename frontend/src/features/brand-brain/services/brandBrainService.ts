@@ -1,76 +1,34 @@
 import axios from "axios";
 
-import type {
-  BrandBrainResponse,
-} from "../types/brandBrain";
-
 const API_URL =
   import.meta.env.VITE_API_URL ??
   "http://127.0.0.1:8000";
 
+
 export async function askBrandBrain(
-  question: string,
   workspaceId: string,
-): Promise<BrandBrainResponse> {
+  question: string,
+) {
   const response =
     await axios.post(
-      `${API_URL}/brand-brain/query`,
+      `${API_URL}/brand-brain/chat`,
       {
-        question,
         workspace_id: workspaceId,
+        question,
       },
     );
 
   return response.data;
 }
 
-export async function streamBrandBrain(
-  question: string,
+
+export async function getBrandHistory(
   workspaceId: string,
-  onChunk: (
-    text: string,
-  ) => void,
 ) {
-
   const response =
-    await fetch(
-      `${API_URL}/brand-brain/stream`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-
-        body: JSON.stringify({
-          question,
-          workspace_id:
-            workspaceId,
-        }),
-      },
+    await axios.get(
+      `${API_URL}/brand-brain/history/${workspaceId}`,
     );
 
-  const reader =
-    response.body?.getReader();
-
-  if (!reader) return;
-
-  const decoder =
-    new TextDecoder();
-
-  while (true) {
-
-    const {
-      done,
-      value,
-    } = await reader.read();
-
-    if (done) break;
-
-    const chunk =
-      decoder.decode(value);
-
-    onChunk(chunk);
-  }
+  return response.data;
 }

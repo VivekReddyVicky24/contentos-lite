@@ -8,8 +8,8 @@ export default function WorkspaceSelector() {
   }
 
   return (
-    <div className="rounded-lg border px-4 py-2">
-      Current Workspace:{" "}
+    <div className="truncate text-sm text-slate-500">
+      Workspace:{" "}
       <span className="font-semibold">
         {workspace.name}
       </span>

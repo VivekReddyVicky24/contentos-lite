@@ -62,3 +62,27 @@ export async function getDocuments(
 
   return data;
 }
+
+export async function deleteDocument(
+  documentId: string,
+  storagePath: string
+) {
+  const { error: storageError } =
+    await supabase.storage
+      .from("documents")
+      .remove([storagePath]);
+
+  if (storageError) {
+    throw storageError;
+  }
+
+  const { error } =
+    await supabase
+      .from("documents")
+      .delete()
+      .eq("id", documentId);
+
+  if (error) {
+    throw error;
+  }
+}

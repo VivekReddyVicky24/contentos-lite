@@ -46,13 +46,30 @@ export default function QualityMetricsChart({
           analytics.average_brand_alignment,
           analytics.average_groundedness,
         ],
+        borderColor: "#059669",
+        backgroundColor: "rgba(5, 150, 105, 0.16)",
+        tension: 0.35,
       },
     ],
   };
 
   return (
-    <div className="rounded-xl border p-6">
-      <Line data={data} />
+    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-lg font-semibold text-slate-950">
+        Quality Metrics
+      </h2>
+      <Line
+        data={data}
+        options={{
+          responsive: true,
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+            },
+          },
+        }}
+      />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { Play } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -32,22 +33,29 @@ export default function TopicForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4"
+      className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
     >
-      <input
-        value={topic}
-        onChange={(e) =>
-          setTopic(e.target.value)
-        }
-        placeholder="Enter a content topic..."
-        className="w-full rounded-lg border p-3"
-      />
+      <label className="block text-left">
+        <span className="text-sm font-medium text-slate-700">
+          Topic
+        </span>
+        <textarea
+          rows={3}
+          value={topic}
+          onChange={(e) =>
+            setTopic(e.target.value)
+          }
+          placeholder="AI content marketing for fitness startups"
+          className="mt-2 w-full resize-none rounded-md border border-slate-300 p-3 text-slate-950 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+        />
+      </label>
 
       <button
         disabled={disabled}
-        className="rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
+        className="mt-4 inline-flex h-10 items-center gap-2 rounded-md bg-emerald-600 px-4 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
       >
-        Generate Content
+        <Play className="size-4" />
+        {disabled ? "Running..." : "Run Pipeline"}
       </button>
     </form>
   );

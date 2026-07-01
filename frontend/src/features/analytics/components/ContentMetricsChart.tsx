@@ -42,13 +42,31 @@ export default function ContentMetricsChart({
           analytics.content_generated,
           analytics.content_published,
         ],
+        backgroundColor: [
+          "#059669",
+          "#0284c7",
+        ],
+        borderRadius: 6,
       },
     ],
   };
 
   return (
-    <div className="rounded-xl border p-6">
-      <Bar data={data} />
+    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-lg font-semibold text-slate-950">
+        Content Metrics
+      </h2>
+      <Bar
+        data={data}
+        options={{
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+        }}
+      />
     </div>
   );
 }

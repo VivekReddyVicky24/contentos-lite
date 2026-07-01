@@ -40,6 +40,8 @@ export default function EvaluationTrendChart({
         data: evaluations.map(
           (e) => e.readability,
         ),
+        borderColor: "#0284c7",
+        tension: 0.35,
       },
 
       {
@@ -47,6 +49,8 @@ export default function EvaluationTrendChart({
         data: evaluations.map(
           (e) => e.brand_alignment,
         ),
+        borderColor: "#059669",
+        tension: 0.35,
       },
 
       {
@@ -54,13 +58,35 @@ export default function EvaluationTrendChart({
         data: evaluations.map(
           (e) => e.groundedness,
         ),
+        borderColor: "#7c3aed",
+        tension: 0.35,
       },
     ],
   };
 
   return (
-    <div className="rounded-xl border p-6">
-      <Line data={data} />
+    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-lg font-semibold text-slate-950">
+        Evaluation Trend
+      </h2>
+      {evaluations.length === 0 ? (
+        <p className="text-sm text-slate-500">
+          Generate content to see quality trends.
+        </p>
+      ) : (
+        <Line
+          data={data}
+          options={{
+            responsive: true,
+            scales: {
+              y: {
+                min: 0,
+                max: 100,
+              },
+            },
+          }}
+        />
+      )}
     </div>
   );
 }

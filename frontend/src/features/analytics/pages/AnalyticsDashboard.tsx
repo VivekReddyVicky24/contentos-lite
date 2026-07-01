@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 import { useWorkspace }
 from "@/features/workspace/context";
@@ -40,25 +41,47 @@ export default function AnalyticsDashboard() {
     null,
   );
 
+  const [loading, setLoading] =
+    useState(true);
+
   useEffect(() => {
 
     if (!workspace) {
       return;
     }
 
-    getAnalytics(
-      workspace.id,
-    ).then(
-      setAnalytics,
-    );
+    const timer =
+      window.setTimeout(() => {
+        setLoading(true);
+
+        getAnalytics(
+          workspace.id,
+        )
+          .then(
+            setAnalytics,
+          )
+          .catch((error) => {
+            console.error(error);
+            toast.error(
+              "Could not load analytics.",
+            );
+          })
+          .finally(() =>
+            setLoading(false),
+          );
+      }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
 
   }, [workspace]);
 
 
-  if (!analytics) {
+  if (loading || !analytics) {
 
     return (
-      <div className="p-8">
+      <div className="text-sm text-slate-500">
         Loading...
       </div>
     );
@@ -66,11 +89,19 @@ export default function AnalyticsDashboard() {
 
   return (
 
-    <div className="mx-auto max-w-7xl p-8">
+    <div className="space-y-6 text-left">
 
-      <h1 className="mb-8 text-4xl font-bold">
-        Analytics Dashboard
-      </h1>
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+          Performance
+        </p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
+          Analytics Dashboard
+        </h1>
+        <p className="mt-2 text-slate-500">
+          Track generation volume, publishing activity, and quality scores.
+        </p>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
 
@@ -106,7 +137,7 @@ export default function AnalyticsDashboard() {
 
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
 
         <ContentMetricsChart
           analytics={analytics}
@@ -118,7 +149,7 @@ export default function AnalyticsDashboard() {
 
       </div>
 
-      <div className="mt-8">
+      <div>
 
         <InsightsCard
           analytics={analytics}

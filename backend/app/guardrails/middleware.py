@@ -111,5 +111,5 @@ def validate_input(
 
         raise HTTPException(
             status_code=400,
-            detail="Brand policy violation detected.",
+            detail="Brand policy violation.",
         )

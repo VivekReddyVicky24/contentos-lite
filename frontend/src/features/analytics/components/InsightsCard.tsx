@@ -36,13 +36,15 @@ export default function InsightsCard({
   }
 
   return (
-    <div className="rounded-xl border p-6">
+    <div className="rounded-lg border border-slate-200 bg-white p-6 text-left shadow-sm">
 
-      <h2 className="mb-4 text-xl font-bold">
+      <h2 className="mb-4 text-lg font-semibold text-slate-950">
         AI Insights
       </h2>
 
-      <p>{insight}</p>
+      <p className="text-slate-600">
+        {insight}
+      </p>
 
     </div>
   );

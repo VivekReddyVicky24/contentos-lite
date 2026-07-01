@@ -42,6 +42,9 @@ from app.api.publish import (
 from app.api.analytics import (
     router as analytics_router,
 )
+from app.api.brand_brain import (
+    router as brand_brain_router,
+)
 
 
 
@@ -144,6 +147,10 @@ app.include_router(
 
 app.include_router(
     analytics_router
+)
+
+app.include_router(
+    brand_brain_router
 )
 
 @app.get("/")
