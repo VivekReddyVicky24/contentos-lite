@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Brain,
+  CalendarDays,
   FileText,
   LayoutDashboard,
   Megaphone,
@@ -43,6 +44,11 @@ const navItems = [
     to: "/content-studio",
     label: "Content Studio",
     icon: PenLine,
+  },
+  {
+    to: "/content-plan",
+    label: "Content Planner",
+    icon: CalendarDays,
   },
   {
     to: "/evaluations",

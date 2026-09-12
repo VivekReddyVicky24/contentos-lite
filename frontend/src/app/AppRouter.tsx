@@ -20,6 +20,10 @@ import PublishingDashboard from "@/features/publish/pages/PublishingDashboard";
 
 import AnalyticsDashboard from "@/features/analytics/pages/AnalyticsDashboard";
 
+import StrategyPage from "@/features/strategy/pages/StrategyPage";
+
+import ContentPlanPage from "@/features/content-plan/pages/ContentPlanPage";
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -42,6 +46,17 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/content-plan"
+  element={
+    <ProtectedRoute>
+      <WorkspaceGuard>
+        <ContentPlanPage />
+      </WorkspaceGuard>
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/"
@@ -141,6 +156,20 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+
+
+        <Route
+          path="/strategy"
+          element={
+            <ProtectedRoute>
+              <WorkspaceGuard>
+                <StrategyPage />
+              </WorkspaceGuard>
+            </ProtectedRoute>
+          }
+        />
+
+        
       </Routes>
     </BrowserRouter>
   );

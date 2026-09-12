@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import (
+    CORSMiddleware,
+)
 from app.core.startup_checks import (
     validate_environment,
 )
@@ -45,8 +47,15 @@ from app.api.analytics import (
 from app.api.brand_brain import (
     router as brand_brain_router,
 )
-
-
+from app.api.strategy import (
+    router as strategy_router,
+)
+from app.api.content_plan import (
+    router as content_plan_router,
+)
+from app.api.content_items import (
+    router as content_items_router,
+)
 
 validate_environment()
 
@@ -55,13 +64,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-origins = [
-    "http://localhost:5173",
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -152,6 +160,19 @@ app.include_router(
 app.include_router(
     brand_brain_router
 )
+
+app.include_router(
+    strategy_router
+)
+
+app.include_router(
+    content_plan_router
+)
+
+app.include_router(
+    content_items_router
+)
+
 
 @app.get("/")
 def root():
