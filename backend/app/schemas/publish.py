@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class PublishRequest(
     BaseModel
 ):
-
     workspace_id: str
 
     platform: Literal[
@@ -18,3 +17,13 @@ class PublishRequest(
     title: str
 
     content: str
+
+
+class PublishContentItemRequest(
+    BaseModel
+):
+    platform: Literal[
+        "medium",
+        "wordpress",
+        "ghost",
+    ]

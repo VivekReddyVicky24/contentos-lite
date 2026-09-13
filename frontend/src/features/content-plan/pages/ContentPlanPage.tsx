@@ -7,9 +7,12 @@ import { useWorkspace } from "@/features/workspace/context";
 
 import {
   addContentItem,
+  approveContent,
+  generateContent,
   getContentItems,
   getMonthlyPlan,
   regenerateMonthlyPlan,
+  rejectContent,
 } from "../services/contentPlanService";
 
 import type {
@@ -23,6 +26,26 @@ interface ContentItem {
   topic: string;
   channel: string;
   status: string;
+  content?: {
+    title?: string;
+    introduction?: string;
+    sections?: Array<{
+      heading?: string;
+      content?: string;
+    }>;
+    conclusion?: string;
+    call_to_action?: string;
+    editor_notes?: string[];
+  };
+  evaluation?: {
+    overall_score?: number;
+    readability?: number;
+    brand_alignment?: number;
+    groundedness?: number;
+    [key: string]: unknown;
+  };
+  approval_status?: string;
+  reviewer_notes?: string;
 }
 
 
@@ -41,6 +64,18 @@ export default function ContentPlanPage() {
     useState(false);
 
   const [regenerating, setRegenerating] =
+    useState(false);
+
+  const [generatingId, setGeneratingId] =
+    useState<string | null>(null);
+
+  const [reviewItem, setReviewItem] =
+    useState<ContentItem | null>(null);
+
+  const [reviewerNotes, setReviewerNotes] =
+    useState("");
+
+  const [approvalLoading, setApprovalLoading] =
     useState(false);
 
   const [error, setError] =
@@ -176,6 +211,97 @@ export default function ContentPlanPage() {
       );
     } finally {
       setRegenerating(false);
+    }
+  };
+
+  const handleGenerateContent = async (
+    contentItemId: string,
+  ) => {
+    if (!workspace?.id) return;
+
+    try {
+      setGeneratingId(contentItemId);
+
+      const response =
+        await generateContent(
+          contentItemId,
+        );
+
+      console.log(
+        "Content generated:",
+        response,
+      );
+
+      const items = await getContentItems(
+        workspace.id,
+      );
+
+      setContentItems(items || []);
+    } catch (error) {
+      console.error(
+        "Content generation failed:",
+        error,
+      );
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!reviewItem || !workspace?.id) return;
+
+    try {
+      setApprovalLoading(true);
+
+      await approveContent(
+        reviewItem.id,
+        reviewerNotes,
+      );
+
+      const items =
+        await getContentItems(
+          workspace.id,
+        );
+
+      setContentItems(items || []);
+      setReviewItem(null);
+      setReviewerNotes("");
+    } catch (error) {
+      console.error(
+        "Approval failed:",
+        error,
+      );
+    } finally {
+      setApprovalLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!reviewItem || !workspace?.id) return;
+
+    try {
+      setApprovalLoading(true);
+
+      await rejectContent(
+        reviewItem.id,
+        reviewerNotes,
+      );
+
+      const items =
+        await getContentItems(
+          workspace.id,
+        );
+
+      setContentItems(items || []);
+      setReviewItem(null);
+      setReviewerNotes("");
+    } catch (error) {
+      console.error(
+        "Rejection failed:",
+        error,
+      );
+    } finally {
+      setApprovalLoading(false);
     }
   };
 
@@ -397,7 +523,7 @@ export default function ContentPlanPage() {
 
                 <div
                   key={item.id}
-                  className="flex items-center justify-between rounded-xl border p-5"
+                  className="flex items-center justify-between gap-4 rounded-xl border p-5"
                 >
 
                   <div>
@@ -412,10 +538,42 @@ export default function ContentPlanPage() {
 
                   </div>
 
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        handleGenerateContent(item.id)
+                      }
+                      disabled={
+                        generatingId === item.id ||
+                        item.status === "generating"
+                      }
+                      className="rounded-lg bg-black px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {generatingId === item.id
+                        ? "Generating..."
+                        : item.status === "awaiting_approval"
+                          ? "Regenerate Content"
+                          : "Generate Content"}
+                    </button>
 
-                  <span className="rounded-full border px-3 py-1 text-sm">
-                    {item.status}
-                  </span>
+                    {item.status === "awaiting_approval" && (
+                      <button
+                        onClick={() => {
+                          setReviewItem(item);
+                          setReviewerNotes(
+                            item.reviewer_notes || "",
+                          );
+                        }}
+                        className="rounded-lg border px-4 py-2 text-sm"
+                      >
+                        Review Content
+                      </button>
+                    )}
+
+                    <span className="rounded-full border px-3 py-1 text-sm">
+                      {item.status}
+                    </span>
+                  </div>
 
                 </div>
 
@@ -426,6 +584,205 @@ export default function ContentPlanPage() {
         )}
 
       </section>
+
+      {reviewItem && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "24px",
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              borderRadius: "16px",
+              width: "min(900px, 100%)",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              padding: "32px",
+            }}
+          >
+            <h2>
+              Review Generated Content
+            </h2>
+
+            <p
+              style={{
+                color: "#64748b",
+                marginBottom: "24px",
+              }}
+            >
+              {reviewItem.channel}
+            </p>
+
+            {reviewItem.content ? (
+              <>
+                <h3>
+                  {reviewItem.content.title ||
+                    reviewItem.title}
+                </h3>
+
+                {reviewItem.content.introduction && (
+                  <section>
+                    <h4>Introduction</h4>
+
+                    <p>
+                      {reviewItem.content.introduction}
+                    </p>
+                  </section>
+                )}
+
+                {reviewItem.content.sections?.map(
+                  (section, index) => (
+                    <section
+                      key={index}
+                      style={{
+                        marginTop: "20px",
+                      }}
+                    >
+                      <h4>
+                        {section.heading ||
+                          `Section ${index + 1}`}
+                      </h4>
+
+                      <p>
+                        {section.content}
+                      </p>
+                    </section>
+                  ),
+                )}
+
+                {reviewItem.content.conclusion && (
+                  <section
+                    style={{
+                      marginTop: "20px",
+                    }}
+                  >
+                    <h4>Conclusion</h4>
+
+                    <p>
+                      {reviewItem.content.conclusion}
+                    </p>
+                  </section>
+                )}
+
+                {reviewItem.content.call_to_action && (
+                  <section
+                    style={{
+                      marginTop: "20px",
+                    }}
+                  >
+                    <h4>Call to Action</h4>
+
+                    <p>
+                      {reviewItem.content.call_to_action}
+                    </p>
+                  </section>
+                )}
+              </>
+            ) : (
+              <p>
+                No generated content available.
+              </p>
+            )}
+
+            {reviewItem.evaluation && (
+              <section
+                style={{
+                  marginTop: "32px",
+                  padding: "20px",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "12px",
+                }}
+              >
+                <h3>AI Evaluation</h3>
+
+                <pre
+                  style={{
+                    whiteSpace: "pre-wrap",
+                    fontSize: "14px",
+                  }}
+                >
+                  {JSON.stringify(
+                    reviewItem.evaluation,
+                    null,
+                    2,
+                  )}
+                </pre>
+              </section>
+            )}
+
+            <section
+              style={{
+                marginTop: "24px",
+              }}
+            >
+              <h3>Reviewer Notes</h3>
+
+              <textarea
+                value={reviewerNotes}
+                onChange={(event) =>
+                  setReviewerNotes(
+                    event.target.value,
+                  )
+                }
+                placeholder="Add feedback or approval notes..."
+                rows={5}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  resize: "vertical",
+                }}
+              />
+            </section>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+                marginTop: "24px",
+              }}
+            >
+              <button
+                onClick={() => {
+                  setReviewItem(null);
+                  setReviewerNotes("");
+                }}
+                disabled={approvalLoading}
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleReject}
+                disabled={approvalLoading}
+              >
+                {approvalLoading
+                  ? "Processing..."
+                  : "Reject"}
+              </button>
+
+              <button
+                onClick={handleApprove}
+                disabled={approvalLoading}
+              >
+                {approvalLoading
+                  ? "Processing..."
+                  : "Approve"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

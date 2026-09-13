@@ -56,6 +56,9 @@ from app.api.content_plan import (
 from app.api.content_items import (
     router as content_items_router,
 )
+from app.api.content_generation import (
+    router as content_generation_router,
+)
 
 validate_environment()
 
@@ -171,6 +174,9 @@ app.include_router(
 
 app.include_router(
     content_items_router
+)
+app.include_router(
+    content_generation_router
 )
 
 

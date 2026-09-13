@@ -67,3 +67,47 @@ export async function getContentItems(
 
   return response.data;
 }
+
+export async function generateContent(
+  contentItemId: string,
+) {
+  const response = await axios.post(
+    `${API_URL}/content-generation/${contentItemId}`,
+  );
+
+  return response.data;
+}
+
+export async function approveContent(
+  contentItemId: string,
+  reviewerNotes: string,
+) {
+  const response = await axios.post(
+    `${API_URL}/content-items/${contentItemId}/approve`,
+    null,
+    {
+      params: {
+        reviewer_notes: reviewerNotes,
+      },
+    },
+  );
+
+  return response.data;
+}
+
+export async function rejectContent(
+  contentItemId: string,
+  reviewerNotes: string,
+) {
+  const response = await axios.post(
+    `${API_URL}/content-items/${contentItemId}/reject`,
+    null,
+    {
+      params: {
+        reviewer_notes: reviewerNotes,
+      },
+    },
+  );
+
+  return response.data;
+}

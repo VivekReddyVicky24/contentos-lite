@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from app.db.supabase import supabase
 
 
@@ -17,6 +19,7 @@ def create_content_item(
         "channel": channel,
         "status": "planned",
         "scheduled_date": scheduled_date,
+        "approval_status": "pending",
     }
 
     response = (
@@ -39,18 +42,27 @@ def get_content_items(
         supabase
         .table("content_items")
         .select("*")
-        .eq(
-            "workspace_id",
-            workspace_id,
-        )
-        .order(
-            "created_at",
-            desc=False,
-        )
+        .eq("workspace_id", workspace_id)
+        .order("created_at", desc=False)
         .execute()
     )
 
     return response.data or []
+
+
+def get_content_item(
+    content_item_id: str,
+):
+    response = (
+        supabase
+        .table("content_items")
+        .select("*")
+        .eq("id", content_item_id)
+        .maybe_single()
+        .execute()
+    )
+
+    return response.data
 
 
 def update_content_item_status(
@@ -60,15 +72,58 @@ def update_content_item_status(
     response = (
         supabase
         .table("content_items")
-        .update(
-            {
-                "status": status,
-            }
-        )
-        .eq(
-            "id",
-            content_item_id,
-        )
+        .update({
+            "status": status,
+        })
+        .eq("id", content_item_id)
+        .execute()
+    )
+
+    if not response.data:
+        return {}
+
+    return response.data[0]
+
+
+def approve_content_item(
+    content_item_id: str,
+    reviewer_notes: str = "",
+):
+    response = (
+        supabase
+        .table("content_items")
+        .update({
+            "status": "approved",
+            "approval_status": "approved",
+            "reviewer_notes": reviewer_notes,
+            "approved_at": datetime.now(
+                timezone.utc
+            ).isoformat(),
+        })
+        .eq("id", content_item_id)
+        .execute()
+    )
+
+    if not response.data:
+        return {}
+
+    return response.data[0]
+
+
+def reject_content_item(
+    content_item_id: str,
+    reviewer_notes: str = "",
+):
+    response = (
+        supabase
+        .table("content_items")
+        .update({
+            "status": "rejected",
+            "approval_status": "rejected",
+            "reviewer_notes": reviewer_notes,
+            "approved_at": None,
+        })
+        .eq("id", content_item_id)
         .execute()
     )
 

@@ -1,53 +1,96 @@
 import os
+import time
 
-from dotenv import load_dotenv
 from google import genai
+from google.genai import errors
 
-load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 client = genai.Client(
-    api_key=os.getenv(
-        "GEMINI_API_KEY"
-    )
+    api_key=API_KEY
 )
+
+PRIMARY_MODEL = "gemini-2.5-flash"
+FALLBACK_MODEL = "gemini-3.5-flash-lite"
 
 
 def generate_text(
     prompt: str,
 ) -> str:
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+    models = [
+        PRIMARY_MODEL,
+        FALLBACK_MODEL,
+    ]
 
-    return response.text or ""
+    last_error = None
 
+    for model in models:
 
-def generate_grounded_response(
-    question: str,
-    context: str,
-) -> str:
-    prompt = f"""
-You are ContentCrew's Brand Brain.
+        for attempt in range(3):
 
-Answer ONLY using the provided context.
+            try:
 
-If the answer is not present, say:
+                print(
+                    f"LLM request: model={model}, "
+                    f"attempt={attempt + 1}"
+                )
 
-"I could not find that information in the uploaded documents."
+                response = (
+                    client.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                    )
+                )
 
-Be concise and factual.
+                if not response.text:
+                    raise RuntimeError(
+                        f"Empty response from {model}"
+                    )
 
-CONTEXT:
--------------------
-{context}
--------------------
+                print(
+                    f"LLM success: model={model}"
+                )
 
-QUESTION:
-{question}
+                return response.text
 
-ANSWER:
-"""
+            except errors.ServerError as e:
 
-    return generate_text(prompt)
+                last_error = e
+
+                print(
+                    f"LLM server error "
+                    f"(model={model}, "
+                    f"attempt={attempt + 1}): {e}"
+                )
+
+                # Retry transient 5xx errors
+                if attempt < 2:
+
+                    delay = 2 ** attempt
+
+                    print(
+                        f"Retrying in {delay} seconds..."
+                    )
+
+                    time.sleep(delay)
+
+                else:
+
+                    print(
+                        f"Model {model} failed "
+                        f"after 3 attempts."
+                    )
+
+            except Exception as e:
+
+                last_error = e
+
+                print(
+                    f"LLM error "
+                    f"(model={model}): {e}"
+                )
+
+                break
+
+    raise last_error

@@ -4,6 +4,10 @@ import type {
   Publication,
 } from "../types/publication";
 
+import type {
+  PublishRequest,
+} from "../types/publish";
+
 const API_URL =
   import.meta.env.VITE_API_URL ??
   "http://127.0.0.1:8000";
@@ -21,11 +25,6 @@ export async function getPublications(
   return response.data;
 }
 
-import type {
-  PublishRequest,
-} from "../types/publish";
-
-
 export async function publishContent(
   data: PublishRequest,
 ) {
@@ -34,6 +33,25 @@ export async function publishContent(
     await axios.post(
       `${API_URL}/publish`,
       data,
+    );
+
+  return response.data;
+}
+
+export async function publishContentItem(
+  contentItemId: string,
+  platform:
+    | "medium"
+    | "wordpress"
+    | "ghost",
+) {
+
+  const response =
+    await axios.post(
+      `${API_URL}/publish/content-item/${contentItemId}`,
+      {
+        platform,
+      },
     );
 
   return response.data;

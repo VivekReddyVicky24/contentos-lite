@@ -18,16 +18,17 @@ from app.guardrails.middleware import (
 router = APIRouter()
 
 
-class ResearchRequest(
+class ContentGenerationRequest(
     BaseModel,
 ):
     topic: str
     workspace_id: str
+    content_item_id: str | None = None
 
 
 @router.post("/research")
 async def research(
-    request: ResearchRequest,
+    request: ContentGenerationRequest,
 ):
     try:
 
@@ -42,11 +43,24 @@ async def research(
             )
         )
 
+        brand_profile = {
+            **brand_profile,
+            "workspace_id": request.workspace_id,
+        }
+
+        initial_state = {
+            "topic": request.topic,
+            "workspace_id": request.workspace_id,
+            "brand_profile": brand_profile,
+            "content_item_id": request.content_item_id,
+            "execution_log": [],
+            "failed": False,
+            "error_message": "",
+            "approval_status": "pending",
+        }
+
         result = graph.invoke(
-            {
-                "topic": request.topic,
-                "brand_profile": brand_profile,
-            }
+            initial_state
         )
 
         return result
@@ -56,6 +70,6 @@ async def research(
 
     except Exception as e:
         raise HTTPException(
-            status_code=429,
+            status_code=500,
             detail=str(e),
         )
