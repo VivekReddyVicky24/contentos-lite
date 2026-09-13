@@ -1,6 +1,4 @@
 import {
-  useCallback,
-  useEffect,
   useState,
 } from "react";
 import {
@@ -8,6 +6,10 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import {
   useWorkspace,
@@ -16,19 +18,15 @@ import {
 import PublishForm from "../components/PublishForm";
 
 import {
+  getContentItems,
+  type ApprovedContentItem,
+} from "../services/contentPublishingService";
+
+import {
   getPublications,
   publishContent,
   publishContentItem,
 } from "../services/publishService";
-
-import {
-  getContentItems,
-  type ApprovedContentItem,
-} from "../../publishing/services/contentPublishingService";
-
-import type {
-  Publication,
-} from "../types/publication";
 
 
 export default function PublishingDashboard() {
@@ -36,74 +34,37 @@ export default function PublishingDashboard() {
   const {
     workspace,
   } = useWorkspace();
+  const queryClient = useQueryClient();
 
-  const [
-    publications,
-    setPublications,
-  ] = useState<Publication[]>([]);
+  const {
+    data: contentItems = [],
+    isLoading: contentItemsLoading,
+  } = useQuery({
+    queryKey: ["content-items", workspace?.id],
+    queryFn: () =>
+      getContentItems(workspace!.id),
+    enabled: !!workspace?.id,
+  });
 
-  const [loading, setLoading] =
-    useState(true);
+  const {
+    data: publications = [],
+    isLoading: publicationsLoading,
+  } = useQuery({
+    queryKey: ["publications", workspace?.id],
+    queryFn: () =>
+      getPublications(workspace!.id),
+    enabled: !!workspace?.id,
+  });
 
-  const [
-    approvedItems,
-    setApprovedItems,
-  ] = useState<ApprovedContentItem[]>([]);
+  const approvedItems = contentItems.filter(
+    (item: ApprovedContentItem) =>
+      item.status === "approved",
+  );
 
   const [
     publishingId,
     setPublishingId,
   ] = useState<string | null>(null);
-
-
-  const refresh =
-    useCallback(async () => {
-
-      if (!workspace) {
-        setPublications([]);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-
-        const data =
-          await getPublications(
-            workspace.id,
-          );
-
-        setPublications(data);
-
-        const contentItems =
-          await getContentItems(
-            workspace.id,
-          );
-
-        setApprovedItems(
-          contentItems.filter(
-            (item: ApprovedContentItem) =>
-              item.status === "approved",
-          ),
-        );
-      } catch (error) {
-        console.error(error);
-        toast.error(
-          "Could not load publications.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, [workspace]);
-
-
-  useEffect(() => {
-
-    void Promise.resolve().then(
-      refresh,
-    );
-
-  }, [refresh]);
 
 
   async function handlePublish(
@@ -131,7 +92,10 @@ export default function PublishingDashboard() {
         content,
       });
 
-      await refresh();
+      await queryClient.invalidateQueries({
+        queryKey: ["publications", workspace.id],
+      });
+
       toast.success(
         "Publication scheduled.",
       );
@@ -151,7 +115,6 @@ export default function PublishingDashboard() {
       | "wordpress"
       | "ghost",
   ) {
-
     try {
       setPublishingId(contentItemId);
 
@@ -160,13 +123,19 @@ export default function PublishingDashboard() {
         platform,
       );
 
-      await refresh();
+      await queryClient.invalidateQueries({
+        queryKey: ["content-items", workspace?.id],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["publications", workspace?.id],
+      });
 
       toast.success(
         "Content scheduled successfully.",
       );
     } catch (error) {
-      console.error(error);
+      console.error("Publishing failed:", error);
       toast.error(
         "Publishing failed.",
       );
@@ -209,7 +178,13 @@ export default function PublishingDashboard() {
           </p>
         </div>
 
-        {approvedItems.length === 0 ? (
+        {contentItemsLoading ? (
+
+          <div className="rounded-md border border-dashed border-slate-300 p-6 text-sm text-slate-500">
+            Loading approved content...
+          </div>
+
+        ) : approvedItems.length === 0 ? (
 
           <div className="rounded-md border border-dashed border-slate-300 p-6 text-sm text-slate-500">
             No approved content is ready for publishing.
@@ -312,7 +287,7 @@ export default function PublishingDashboard() {
 
       <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
 
-        {loading ? (
+        {publicationsLoading ? (
           <div className="p-6 text-sm text-slate-500">
             Loading publications...
           </div>

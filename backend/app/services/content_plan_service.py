@@ -195,12 +195,22 @@ def _parse_plan(raw_response):
         parsed = _extract_json(raw_response)
 
     else:
-        return DEFAULT_PLAN
+        return DEFAULT_PLAN.copy()
 
     if not isinstance(parsed, dict):
-        return DEFAULT_PLAN
+        return DEFAULT_PLAN.copy()
 
-    return _normalize_weekly_plan(parsed)
+    month = str(
+        parsed.get("month", "")
+        or ""
+    ).strip()
+
+    return {
+        "month": month,
+        "weeks": _normalize_weekly_plan(
+            parsed.get("weeks", [])
+        ),
+    }
 
 
 def _get_current_month():
