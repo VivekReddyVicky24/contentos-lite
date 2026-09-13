@@ -20,3 +20,16 @@ export async function getStrategy(
 
   return response.data;
 }
+
+
+export async function regenerateStrategy(
+  workspaceId: string,
+): Promise<Strategy> {
+
+  const response =
+    await axios.post(
+      `${API_URL}/strategy/${workspaceId}/regenerate`,
+    );
+
+  return response.data;
+}

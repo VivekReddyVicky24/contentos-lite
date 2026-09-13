@@ -177,6 +177,74 @@ def _parse_strategy_payload(
     }
 
 
+def get_saved_strategy(
+    workspace_id: str,
+):
+    response = (
+        supabase
+        .table("strategies")
+        .select("*")
+        .eq(
+            "workspace_id",
+            workspace_id,
+        )
+        .maybe_single()
+        .execute()
+    )
+
+    if not response.data:
+        return dict(DEFAULT_STRATEGY)
+
+    strategy = response.data.get(
+        "strategy"
+    )
+
+    if not isinstance(
+        strategy,
+        dict,
+    ):
+        return dict(DEFAULT_STRATEGY)
+
+    return {
+        "monthly_objectives":
+            _ensure_list(
+                strategy.get(
+                    "monthly_objectives"
+                )
+            ),
+
+        "content_themes":
+            _ensure_list(
+                strategy.get(
+                    "content_themes"
+                )
+            ),
+
+        "recommended_channels":
+            _ensure_list(
+                strategy.get(
+                    "recommended_channels"
+                )
+            ),
+
+        "weekly_plan":
+            _normalize_weekly_plan(
+                _ensure_list(
+                    strategy.get(
+                        "weekly_plan"
+                    )
+                )
+            ),
+
+        "campaign_ideas":
+            _ensure_list(
+                strategy.get(
+                    "campaign_ideas"
+                )
+            ),
+    }
+
+
 def generate_strategy(
     workspace_id: str,
 ):

@@ -1,23 +1,15 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { useWorkspace }
-from "@/features/workspace/context";
+import { useWorkspace } from "@/features/workspace/context";
 
-import AnalyticsCard
-from "../components/AnalyticsCard";
+import AnalyticsCard from "../components/AnalyticsCard";
 
-import ContentMetricsChart
-from "../components/ContentMetricsChart";
+import ContentMetricsChart from "../components/ContentMetricsChart";
 
-import InsightsCard
-from "../components/InsightsCard";
+import InsightsCard from "../components/InsightsCard";
 
-import QualityMetricsChart
-from "../components/QualityMetricsChart";
+import QualityMetricsChart from "../components/QualityMetricsChart";
 
 import {
   getAnalytics,
@@ -34,55 +26,62 @@ export default function AnalyticsDashboard() {
     workspace,
   } = useWorkspace();
 
-  const [
-    analytics,
-    setAnalytics,
-  ] = useState<Analytics | null>(
-    null,
-  );
+  const {
+    data: analytics = null,
+    isLoading,
+    isError,
+  } = useQuery<Analytics>({
+    queryKey: [
+      "analytics",
+      workspace?.id,
+    ],
 
-  const [loading, setLoading] =
-    useState(true);
+    queryFn: async () => {
 
-  useEffect(() => {
+      try {
 
-    if (!workspace) {
-      return;
-    }
+        return await getAnalytics(
+          workspace!.id,
+        );
 
-    const timer =
-      window.setTimeout(() => {
-        setLoading(true);
+      } catch (error) {
 
-        getAnalytics(
-          workspace.id,
-        )
-          .then(
-            setAnalytics,
-          )
-          .catch((error) => {
-            console.error(error);
-            toast.error(
-              "Could not load analytics.",
-            );
-          })
-          .finally(() =>
-            setLoading(false),
-          );
-      }, 0);
+        console.error(
+          "Failed to load analytics:",
+          error,
+        );
 
-    return () => {
-      window.clearTimeout(timer);
-    };
+        toast.error(
+          "Could not load analytics.",
+        );
 
-  }, [workspace]);
+        throw error;
+      }
+    },
 
+    enabled:
+      !!workspace?.id,
 
-  if (loading || !analytics) {
+    staleTime: 30_000,
+  });
+
+  if (
+    isLoading ||
+    !analytics
+  ) {
 
     return (
       <div className="text-sm text-slate-500">
         Loading...
+      </div>
+    );
+  }
+
+  if (isError) {
+
+    return (
+      <div className="text-sm text-red-500">
+        Could not load analytics.
       </div>
     );
   }

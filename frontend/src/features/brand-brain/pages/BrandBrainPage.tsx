@@ -4,6 +4,11 @@ import {
   useState,
 } from "react";
 
+import {
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+
 import { useWorkspace } from "@/features/workspace/context";
 
 import {
@@ -15,36 +20,54 @@ import ChatInput from "../components/ChatInput";
 
 import ChatMessage from "../components/ChatMessage";
 
+interface BrandBrainMessage {
+  id: string;
+  role: "user" | "assistant";
+  message: string;
+}
 
 export default function BrandBrainPage() {
 
-  const { workspace } =
-    useWorkspace();
+  const {
+    workspace,
+  } = useWorkspace();
+
+  const queryClient =
+    useQueryClient();
 
   const messagesEndRef =
     useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] =
-    useState<any[]>([]);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const {
+    data: messages = [],
+    isLoading: historyLoading,
+    isError: historyError,
+  } = useQuery<BrandBrainMessage[]>({
+    queryKey: [
+      "brand-brain-history",
+      workspace?.id,
+    ],
 
+    queryFn: async () => {
 
-  useEffect(() => {
+      const history =
+        await getBrandHistory(
+          workspace!.id,
+        );
 
-    if (!workspace) {
-      return;
-    }
+      return history || [];
+    },
 
-    getBrandHistory(
-      workspace.id,
-    ).then(
-      setMessages,
-    );
+    enabled:
+      !!workspace?.id,
 
-  }, [workspace]);
-
+    staleTime: 30_000,
+  });
 
   useEffect(() => {
 
@@ -55,7 +78,6 @@ export default function BrandBrainPage() {
 
   }, [messages]);
 
-
   async function handleSend(
     question: string,
   ) {
@@ -64,25 +86,29 @@ export default function BrandBrainPage() {
       return;
     }
 
-    setLoading(true);
-
     try {
+
+      setLoading(true);
 
       await askBrandBrain(
         workspace.id,
         question,
       );
 
-      const history =
-        await getBrandHistory(
+      await queryClient.invalidateQueries({
+        queryKey: [
+          "brand-brain-history",
           workspace.id,
-        );
-
-      setMessages(history);
+        ],
+        exact: true,
+      });
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Brand Brain request failed:",
+        error,
+      );
 
     } finally {
 
@@ -91,6 +117,55 @@ export default function BrandBrainPage() {
     }
   }
 
+  if (
+    historyLoading &&
+    messages.length === 0
+  ) {
+
+    return (
+      <div className="mx-auto max-w-5xl p-8">
+
+        <h1 className="mb-6 text-4xl font-bold">
+          Brand Brain
+        </h1>
+
+        <div className="mb-6 flex h-[500px] items-center justify-center rounded-xl border p-6 text-gray-500">
+          Loading Brand Brain history...
+        </div>
+
+        <ChatInput
+          onSend={handleSend}
+          loading={loading}
+        />
+
+      </div>
+    );
+  }
+
+  if (
+    historyError &&
+    messages.length === 0
+  ) {
+
+    return (
+      <div className="mx-auto max-w-5xl p-8">
+
+        <h1 className="mb-6 text-4xl font-bold">
+          Brand Brain
+        </h1>
+
+        <div className="mb-6 rounded-xl border border-red-200 p-6 text-red-600">
+          Unable to load Brand Brain history.
+        </div>
+
+        <ChatInput
+          onSend={handleSend}
+          loading={loading}
+        />
+
+      </div>
+    );
+  }
 
   return (
 
@@ -104,6 +179,7 @@ export default function BrandBrainPage() {
 
         {messages.map(
           (message) => (
+
             <ChatMessage
               key={message.id}
               message={{
@@ -114,6 +190,7 @@ export default function BrandBrainPage() {
                 sources: [],
               }}
             />
+
           ),
         )}
 
@@ -125,7 +202,9 @@ export default function BrandBrainPage() {
 
         )}
 
-        <div ref={messagesEndRef} />
+        <div
+          ref={messagesEndRef}
+        />
 
       </div>
 
