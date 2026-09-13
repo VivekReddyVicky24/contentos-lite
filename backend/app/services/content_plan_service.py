@@ -178,39 +178,29 @@ def _normalize_weekly_plan(
     return normalized_weeks
 
 
-def _parse_plan(
-    raw_response: str,
-):
+def _parse_plan(raw_response):
     """
-    Safely parse and normalize the planner LLM output.
+    Parse and normalize a content plan.
+
+    Gemini may return a JSON string, while Supabase
+    may return the already-parsed JSONB object.
     """
 
-    parsed = _extract_json(
-        raw_response
-    )
+    # Supabase JSONB already returned as a Python dict
+    if isinstance(raw_response, dict):
+        parsed = raw_response
+
+    # Gemini/string response
+    elif isinstance(raw_response, str):
+        parsed = _extract_json(raw_response)
+
+    else:
+        return DEFAULT_PLAN
 
     if not isinstance(parsed, dict):
-        return dict(DEFAULT_PLAN)
+        return DEFAULT_PLAN
 
-    month = str(
-        parsed.get(
-            "month",
-            "",
-        )
-        or ""
-    ).strip()
-
-    weeks = _normalize_weekly_plan(
-        parsed.get(
-            "weeks",
-            [],
-        )
-    )
-
-    return {
-        "month": month,
-        "weeks": weeks,
-    }
+    return _normalize_weekly_plan(parsed)
 
 
 def _get_current_month():
@@ -445,3 +435,19 @@ RETURN JSON ONLY
     )
 
     return plan
+
+
+def get_saved_monthly_plan(workspace_id: str):
+    response = (
+        supabase
+        .table("content_plans")
+        .select("*")
+        .eq("workspace_id", workspace_id)
+        .maybe_single()
+        .execute()
+    )
+
+    if not response.data:
+        return DEFAULT_PLAN
+
+    return _parse_plan(response.data.get("plan"))
